@@ -7,20 +7,21 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
 class JibangPdfService {
-  static ({pw.Font base, pw.Font bold, pw.Font hanja})? _cachedFonts;
+  static ({pw.Font base, pw.Font bold, pw.Font hanja, pw.Font gungsuh})? _cachedFonts;
 
   Future<pw.Font> _load(String asset) async {
     final data = await rootBundle.load(asset);
     return pw.Font.ttf(data);
   }
 
-  Future<({pw.Font base, pw.Font bold, pw.Font hanja})> _fonts() async {
+  Future<({pw.Font base, pw.Font bold, pw.Font hanja, pw.Font gungsuh})> _fonts() async {
     final cached = _cachedFonts;
     if (cached != null) return cached;
     final base = await _load('assets/fonts/NanumMyeongjo-Regular.ttf');
     final bold = await _load('assets/fonts/NanumMyeongjo-Bold.ttf');
     final hanja = await _load('assets/fonts/NotoSerifKR-Hanja.ttf');
-    return _cachedFonts = (base: base, bold: bold, hanja: hanja);
+    final gungsuh = await _load('assets/fonts/NotoSerifKR-Black.ttf');
+    return _cachedFonts = (base: base, bold: bold, hanja: hanja, gungsuh: gungsuh);
   }
 
   Future<void> warmUp() async {
@@ -93,33 +94,13 @@ class JibangPdfService {
     if (chukmun != null && chukmun.columns.isNotEmpty) {
       doc.addPage(
         pw.Page(
-          pageFormat: PdfPageFormat.a4,
-          margin: const pw.EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+          pageFormat: PdfPageFormat.a4.landscape,
+          margin: const pw.EdgeInsets.all(0),
           build: (context) {
-            return pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Text(
-                  '김가네 축문',
-                  style: _style(fonts.bold, fallback, 18),
-                ),
-                pw.SizedBox(height: 6),
-                pw.Text(
-                  '오른쪽부터 세로로 읽습니다. 제주 김영필이 고하는 한글 축문입니다.',
-                  style: _style(fonts.base, fallback, 10).copyWith(lineSpacing: 4),
-                ),
-                pw.SizedBox(height: 20),
-                pw.Expanded(
-                  child: pw.Center(
-                    child: _chukmunPaper(chukmun, fonts.bold, fallback),
-                  ),
-                ),
-                pw.Text(
-                  '광산김씨 · 경상북도 의성 가례 기준 안내. 집안 홀기가 있으면 홀기를 따릅니다.',
-                  style: _style(fonts.base, fallback, 9)
-                      .copyWith(color: PdfColors.grey700),
-                ),
-              ],
+            return _chukmunPaper(
+              chukmun,
+              fonts.gungsuh,
+              [fonts.base, fonts.hanja, fonts.bold],
             );
           },
         ),
@@ -177,40 +158,57 @@ class JibangPdfService {
 
   pw.Widget _chukmunPaper(
     ChukmunText chukmun,
-    pw.Font bold,
+    pw.Font font,
     List<pw.Font> fallback,
   ) {
-    final columns = [
-      for (final column in chukmun.columns)
-        [
-          for (final rune in column.runes)
-            String.fromCharCode(rune),
-        ].where((ch) => ch.trim().isNotEmpty).toList(),
-    ];
+    const padding = pw.EdgeInsets.fromLTRB(28, 32, 28, 24);
+    final page = PdfPageFormat.a4.landscape;
+    final fit = ChukmunFit.forPage(
+      text: chukmun,
+      innerWidth: page.width - padding.left - padding.right,
+      innerHeight: page.height - padding.top - padding.bottom,
+    );
+    final lines = chukmun.verticalLines(maxCharsPerColumn: fit.maxCharsPerColumn);
+
     return pw.Container(
-      width: 170 * PdfPageFormat.mm,
-      height: 210 * PdfPageFormat.mm,
-      decoration: pw.BoxDecoration(
-        color: PdfColor.fromInt(0xFFFFF8EA),
-        border: pw.Border.all(width: 0.8),
-      ),
-      padding: const pw.EdgeInsets.fromLTRB(10, 16, 10, 12),
-      child: pw.Row(
-        children: [
-          for (final column in columns.reversed)
-            pw.Expanded(
-              child: pw.Padding(
-                padding: const pw.EdgeInsets.symmetric(horizontal: 1),
-                child: pw.Column(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
-                  children: [
-                    for (final ch in column)
-                      pw.Text(ch, style: _style(bold, fallback, 11)),
-                  ],
+      width: page.width,
+      height: page.height,
+      color: PdfColor.fromInt(0xFFFFF8EA),
+      padding: padding,
+      child: pw.Align(
+        alignment: pw.Alignment.topRight,
+        child: pw.Row(
+          mainAxisSize: pw.MainAxisSize.min,
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            for (final line in lines.reversed)
+              pw.Padding(
+                padding: pw.EdgeInsets.symmetric(horizontal: fit.columnGap / 2),
+                child: pw.SizedBox(
+                  width: fit.columnWidth,
+                  child: pw.Column(
+                    mainAxisSize: pw.MainAxisSize.min,
+                    children: [
+                      for (final ch in line)
+                        pw.SizedBox(
+                          height: ch.trim().isEmpty
+                              ? fit.charHeight * 0.55
+                              : fit.charHeight,
+                          child: ch.trim().isEmpty
+                              ? pw.SizedBox()
+                              : pw.Center(
+                                  child: pw.Text(
+                                    ch,
+                                    style: _style(font, fallback, fit.fontSize),
+                                  ),
+                                ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

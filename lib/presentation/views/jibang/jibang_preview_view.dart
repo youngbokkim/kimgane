@@ -66,7 +66,7 @@ class JibangPreviewView extends ConsumerWidget {
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
             child: Text(
-              '화면에서 확인하고, 인쇄하면 지방은 A4에 6×22cm 규격으로, 축문은 다음 장에 나갑니다. '
+              '화면에서 확인하고, 인쇄하면 지방은 A4 세로 6×22cm 규격으로, 축문은 A4 가로로 나갑니다. '
               '지방은 위를 둥글게 오리고 제사가 끝나면 소각합니다.',
               style: TextStyle(color: AppColors.inkMuted),
             ),
@@ -144,7 +144,7 @@ class JibangPreviewView extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          ChukmunPaper(chukmun: chukmun, height: 460),
+                          ChukmunPaper(chukmun: chukmun, height: 320),
                           const SizedBox(height: 16),
                           FilledButton.icon(
                             onPressed: () => _export(
@@ -251,7 +251,7 @@ Future<void> _export(
           title: Text(print ? '인쇄할 PDF' : 'PDF 저장'),
           content: const Text(
             '아래 버튼을 누르면 김가네_지방_축문.pdf 파일이 저장됩니다. '
-            '1장은 지방, 2장은 축문입니다. 저장한 파일을 열어 인쇄할 수 있습니다.',
+            '1장은 지방(A4 세로), 2장은 축문(A4 가로)입니다. 저장한 파일을 열어 인쇄할 수 있습니다.',
           ),
           actions: [
             TextButton(

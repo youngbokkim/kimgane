@@ -49,6 +49,10 @@ flutter:
         - asset: assets/fonts/NanumGothic-Regular.ttf
         - asset: assets/fonts/NanumGothic-Bold.ttf
           weight: 700
+    - family: NotoSerifKRBlack
+      fonts:
+        - asset: assets/fonts/NotoSerifKR-Black.ttf
+          weight: 900
     - family: NotoSerifKR
       fonts:
         - asset: assets/fonts/NotoSerifKR-Hanja.ttf

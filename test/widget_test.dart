@@ -73,6 +73,52 @@ void main() {
     expect(joined, contains('흠향'));
   });
 
+  test('축문 세로줄은 칸이 차면 다음 줄로 넘어간다', () {
+    const text = ChukmunText(
+      columns: ['가나다라마바사'],
+      plainText: '가나다라마바사',
+    );
+    expect(text.verticalLines(maxCharsPerColumn: 3), [
+      ['가', '나', '다'],
+      ['라', '마', '바'],
+      ['사'],
+    ]);
+  });
+
+  test('축문 세로줄은 띄어쓰기를 칸으로 남긴다', () {
+    const text = ChukmunText(
+      columns: ['효손 영필이'],
+      plainText: '효손 영필이',
+    );
+    expect(text.charsOf('효손 영필이'), ['효', '손', ' ', '영', '필', '이']);
+  });
+
+  test('축문 글자 크기는 A4 가로 한 장에 들어가게 맞춘다', () {
+    final composer = ChukmunComposer(LunarService());
+    final members = SeedData.members();
+    final text = composer.compose(
+      ancestors: [
+        members.firstWhere((m) => m.kinship == Kinship.grandfather),
+        members.firstWhere((m) => m.kinship == Kinship.grandmother),
+      ],
+      events: SeedData.events(),
+      now: DateTime(2026, 1, 1),
+    );
+    const innerWidth = 785.0;
+    const innerHeight = 539.0;
+    final fit = ChukmunFit.forPage(
+      text: text,
+      innerWidth: innerWidth,
+      innerHeight: innerHeight,
+    );
+    final lines = text.verticalLines(maxCharsPerColumn: fit.maxCharsPerColumn);
+    final usedWidth = lines.length * (fit.columnWidth + fit.columnGap);
+    final usedHeight = text.longestLineLength * fit.charHeight;
+    expect(usedWidth, lessThanOrEqualTo(innerWidth + 0.5));
+    expect(usedHeight, lessThanOrEqualTo(innerHeight + 0.5));
+    expect(lines.length, text.lineCount);
+  });
+
   test('생존 가족은 기타 대신 생일을 보여 준다', () {
     final yeongpil = SeedData.members().firstWhere((m) => m.name == '김영필');
     final yeongok = SeedData.members().firstWhere((m) => m.name == '김영옥');

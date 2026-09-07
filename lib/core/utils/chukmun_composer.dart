@@ -11,6 +11,95 @@ class ChukmunText {
 
   final List<String> columns;
   final String plainText;
+
+  List<String> charsOf(String column) {
+    return [
+      for (final rune in column.trim().runes) String.fromCharCode(rune),
+    ];
+  }
+
+  int get lineCount => columns.where((c) => charsOf(c).isNotEmpty).length;
+
+  int get longestLineLength {
+    var longest = 0;
+    for (final column in columns) {
+      final n = charsOf(column).length;
+      if (n > longest) longest = n;
+    }
+    return longest;
+  }
+
+  /// 각 구절을 세로 한 줄로 두고, 칸이 차면 다음 줄(왼쪽)로 넘긴다.
+  List<List<String>> verticalLines({required int maxCharsPerColumn}) {
+    final limit = maxCharsPerColumn < 1 ? 1 : maxCharsPerColumn;
+    final lines = <List<String>>[];
+    for (final column in columns) {
+      final chars = charsOf(column);
+      if (chars.isEmpty) continue;
+      for (var i = 0; i < chars.length; i += limit) {
+        final end = i + limit > chars.length ? chars.length : i + limit;
+        lines.add(chars.sublist(i, end));
+      }
+    }
+    return lines;
+  }
+}
+
+class ChukmunFit {
+  const ChukmunFit({
+    required this.fontSize,
+    required this.charHeight,
+    required this.columnWidth,
+    required this.columnGap,
+    required this.maxCharsPerColumn,
+  });
+
+  final double fontSize;
+  final double charHeight;
+  final double columnWidth;
+  final double columnGap;
+  final int maxCharsPerColumn;
+
+  /// A4 가로 한 장에 모든 세로줄이 들어가도록 글자 크기를 줄인다.
+  /// 글자 간격은 페이지를 채우려고 늘리지 않는다.
+  factory ChukmunFit.forPage({
+    required ChukmunText text,
+    required double innerWidth,
+    required double innerHeight,
+    double maxFontSize = 15,
+    double minFontSize = 9,
+    bool brush = false,
+  }) {
+    final lines = text.lineCount;
+    final longest = text.longestLineLength;
+    if (lines == 0 || longest == 0) {
+      return const ChukmunFit(
+        fontSize: 14,
+        charHeight: 16.5,
+        columnWidth: 17,
+        columnGap: 6,
+        maxCharsPerColumn: 1,
+      );
+    }
+
+    final heightFactor = brush ? 1.32 : 1.2;
+    final widthPitch = brush ? 1.9 : 1.65;
+    final cap = brush ? 14.0 : maxFontSize;
+    final byHeight = innerHeight / (longest * heightFactor);
+    final byWidth = innerWidth / (lines * widthPitch);
+    var font = byHeight < byWidth ? byHeight : byWidth;
+    if (font > cap) font = cap;
+    if (font < minFontSize) font = minFontSize;
+
+    final charHeight = font * (brush ? 1.28 : 1.18);
+    return ChukmunFit(
+      fontSize: font,
+      charHeight: charHeight,
+      columnWidth: font * (brush ? 1.4 : 1.22),
+      columnGap: font * (brush ? 0.42 : 0.38),
+      maxCharsPerColumn: (innerHeight / charHeight).floor().clamp(1, 1000),
+    );
+  }
 }
 
 class ChukmunComposer {
@@ -132,7 +221,7 @@ class ChukmunComposer {
         '의 기일이 도래하였네요.',
         '생전에 ${honorifics[0]}과 ${honorifics[1]}의',
         '은공을 갚을 길이 없사옵니다.',
-        '이에 후손들이 여러가지 음식과',
+        '이에 후손들이 여러 가지 음식과',
         '맑은 술을 올리오니',
         '흠향 하시옵소서.',
         '${shortNames[0]} ${shortNames[1]} 저희',
@@ -148,7 +237,7 @@ class ChukmunComposer {
       '기일이 도래하였네요.',
       '생전에 ${honorifics.first}의',
       '은공을 갚을 길이 없사옵니다.',
-      '이에 후손들이 여러가지 음식과',
+      '이에 후손들이 여러 가지 음식과',
       '맑은 술을 올리오니',
       '흠향 하시옵소서.',
       '${shortNames.first} 저희',
