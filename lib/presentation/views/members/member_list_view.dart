@@ -53,14 +53,22 @@ class _Group extends StatelessWidget {
             Card(
               child: ListTile(
                 title: Text(member.name),
-                subtitle: Text(
-                  '${member.kinship.label} · ${member.displayClan}'
-                  '${member.isDeceased ? ' · 故' : ''}',
-                ),
+                subtitle: Text(_subtitle(member)),
                 onTap: () => context.push('/members/${member.id}/edit'),
               ),
             ),
       ],
     );
+  }
+
+  String _subtitle(FamilyMember member) {
+    if (member.isDeceased) {
+      return '${member.kinship.label} · ${member.displayClan} · 故';
+    }
+    return [
+      if (member.kinship != Kinship.other) member.kinship.label,
+      member.displayClan,
+      member.birthDateLabel ?? '생일 미등록',
+    ].join(' · ');
   }
 }

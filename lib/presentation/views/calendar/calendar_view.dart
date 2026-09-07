@@ -54,6 +54,8 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
     return Scaffold(
       appBar: AppBar(title: const Text('달력')),
       body: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.only(bottom: 24),
         children: [
           TableCalendar<EventOccurrence>(
             locale: 'ko_KR',
@@ -63,6 +65,7 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
             selectedDayPredicate: (day) => isSameDay(day, _selected),
             eventLoader: eventsOn,
             calendarFormat: CalendarFormat.month,
+            availableGestures: AvailableGestures.horizontalSwipe,
             rowHeight: 108,
             daysOfWeekHeight: 28,
             headerStyle: const HeaderStyle(

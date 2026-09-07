@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:kimgane/core/utils/jibang_composer.dart';
 import 'package:pdf/pdf.dart';
@@ -5,16 +6,26 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
 class JibangPdfService {
+  static ({pw.Font base, pw.Font bold, pw.Font hanja})? _cachedFonts;
+
   Future<pw.Font> _load(String asset) async {
     final data = await rootBundle.load(asset);
     return pw.Font.ttf(data);
   }
 
   Future<({pw.Font base, pw.Font bold, pw.Font hanja})> _fonts() async {
+    final cached = _cachedFonts;
+    if (cached != null) return cached;
     final base = await _load('assets/fonts/NanumMyeongjo-Regular.ttf');
     final bold = await _load('assets/fonts/NanumMyeongjo-Bold.ttf');
     final hanja = await _load('assets/fonts/NotoSerifKR-Hanja.ttf');
-    return (base: base, bold: bold, hanja: hanja);
+    return _cachedFonts = (base: base, bold: bold, hanja: hanja);
+  }
+
+  Future<void> warmUp() async {
+    try {
+      await _fonts();
+    } catch (_) {}
   }
 
   pw.TextStyle _style(pw.Font font, List<pw.Font> fallback, double size) {
@@ -126,12 +137,32 @@ class JibangPdfService {
     );
   }
 
-  Future<void> previewAndPrint({
+  Future<bool> savePdf({
     required List<JibangPersonText> people,
     required bool useHanja,
   }) async {
-    await Printing.layoutPdf(
-      onLayout: (_) => buildPdf(people: people, useHanja: useHanja),
+    final bytes = await buildPdf(people: people, useHanja: useHanja);
+    return Printing.sharePdf(
+      bytes: bytes,
+      filename: '김가네_지방.pdf',
+    );
+  }
+
+  Future<bool> printPdf({
+    required List<JibangPersonText> people,
+    required bool useHanja,
+  }) async {
+    final bytes = await buildPdf(people: people, useHanja: useHanja);
+    if (kIsWeb) {
+      // Chrome blocks print() on a hidden iframe after async PDF generation,
+      // so download the file and let the user open/print it.
+      return Printing.sharePdf(
+        bytes: bytes,
+        filename: '김가네_지방.pdf',
+      );
+    }
+    return Printing.layoutPdf(
+      onLayout: (_) async => bytes,
       name: '김가네_지방',
     );
   }

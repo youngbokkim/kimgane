@@ -42,6 +42,14 @@ void main() {
     expect(jibang.compose(grandmother).hanja, '顯祖妣孺人尙山朴氏神位');
   });
 
+  test('생존 가족은 기타 대신 생일을 보여 준다', () {
+    final yeongpil = SeedData.members().firstWhere((m) => m.name == '김영필');
+    final yeongok = SeedData.members().firstWhere((m) => m.name == '김영옥');
+    expect(yeongpil.kinship, Kinship.other);
+    expect(yeongpil.birthDateLabel, '음력 1월 20일');
+    expect(yeongok.birthDateLabel, isNull);
+  });
+
   testWidgets('홈에 김가네와 광산김씨가 보인다', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
@@ -59,5 +67,27 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('직계선조 묘비'), findsOneWidget);
     expect(find.textContaining('가선대부'), findsWidgets);
+  });
+
+  testWidgets('가족 탭에서 생존은 생일이 보이고 제사 대상은 유지된다', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    await SeedCoordinator(LocalStore(prefs)).seedIfNeeded();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        child: KimganeApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('가족'));
+    await tester.pumpAndSettle();
+    expect(find.text('김영필'), findsOneWidget);
+    expect(find.textContaining('음력 1월 20일'), findsWidgets);
+    expect(find.textContaining('기타'), findsNothing);
+    await tester.scrollUntilVisible(find.text('김명룡'), 400);
+    expect(find.text('김명룡'), findsOneWidget);
+    expect(find.textContaining('할아버지'), findsWidgets);
+    expect(find.textContaining('故'), findsWidgets);
   });
 }

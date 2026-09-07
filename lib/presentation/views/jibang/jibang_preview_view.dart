@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kimgane/core/theme/app_theme.dart';
+import 'package:kimgane/core/utils/jibang_composer.dart';
 import 'package:kimgane/core/utils/jibang_pdf_service.dart';
 import 'package:kimgane/presentation/viewmodels/app_view_models.dart';
 import 'package:kimgane/presentation/widgets/jibang_paper.dart';
@@ -16,7 +18,7 @@ class JibangPreviewView extends ConsumerWidget {
     final members = ref.watch(membersViewModelProvider);
     final selected = members.where((m) => state.selectedIds.contains(m.id)).toList();
     final texts = ref.watch(jibangComposerProvider).pairFor(selected);
-    final pdf = JibangPdfService();
+    final pdf = JibangPdfService()..warmUp();
 
     if (texts.isEmpty) {
       return Scaffold(
@@ -30,10 +32,24 @@ class JibangPreviewView extends ConsumerWidget {
         title: const Text('지방 미리보기'),
         actions: [
           IconButton(
-            tooltip: '인쇄',
-            onPressed: () => pdf.previewAndPrint(
+            tooltip: 'PDF 저장',
+            onPressed: () => _export(
+              context,
+              pdf: pdf,
               people: texts,
               useHanja: state.useHanja,
+              print: false,
+            ),
+            icon: const Icon(Icons.download_outlined),
+          ),
+          IconButton(
+            tooltip: '인쇄',
+            onPressed: () => _export(
+              context,
+              pdf: pdf,
+              people: texts,
+              useHanja: state.useHanja,
+              print: true,
             ),
             icon: const Icon(Icons.print_outlined),
           ),
@@ -63,12 +79,27 @@ class JibangPreviewView extends ConsumerWidget {
                       ),
                       const SizedBox(height: 16),
                       FilledButton.icon(
-                        onPressed: () => pdf.previewAndPrint(
+                        onPressed: () => _export(
+                          context,
+                          pdf: pdf,
                           people: texts,
                           useHanja: state.useHanja,
+                          print: false,
+                        ),
+                        icon: const Icon(Icons.download_outlined),
+                        label: const Text('PDF 저장'),
+                      ),
+                      const SizedBox(height: 8),
+                      OutlinedButton.icon(
+                        onPressed: () => _export(
+                          context,
+                          pdf: pdf,
+                          people: texts,
+                          useHanja: state.useHanja,
+                          print: true,
                         ),
                         icon: const Icon(Icons.print_outlined),
-                        label: const Text('인쇄 / PDF 저장'),
+                        label: const Text('인쇄'),
                       ),
                     ],
                   );
@@ -76,13 +107,39 @@ class JibangPreviewView extends ConsumerWidget {
                 return Row(
                   children: [
                     Expanded(
-                      child: Padding(
+                      child: ListView(
                         padding: const EdgeInsets.all(16),
-                        child: JibangPaper(
-                          people: texts,
-                          useHanja: state.useHanja,
-                          height: 520,
-                        ),
+                        children: [
+                          JibangPaper(
+                            people: texts,
+                            useHanja: state.useHanja,
+                            height: 520,
+                          ),
+                          const SizedBox(height: 16),
+                          FilledButton.icon(
+                            onPressed: () => _export(
+                              context,
+                              pdf: pdf,
+                              people: texts,
+                              useHanja: state.useHanja,
+                              print: false,
+                            ),
+                            icon: const Icon(Icons.download_outlined),
+                            label: const Text('PDF 저장'),
+                          ),
+                          const SizedBox(height: 8),
+                          OutlinedButton.icon(
+                            onPressed: () => _export(
+                              context,
+                              pdf: pdf,
+                              people: texts,
+                              useHanja: state.useHanja,
+                              print: true,
+                            ),
+                            icon: const Icon(Icons.print_outlined),
+                            label: const Text('인쇄'),
+                          ),
+                        ],
                       ),
                     ),
                     const VerticalDivider(width: 1),
@@ -95,6 +152,7 @@ class JibangPreviewView extends ConsumerWidget {
                         pdfFileName: '김가네_지방.pdf',
                         initialPageFormat: PdfPageFormat.a4,
                         canChangeOrientation: false,
+                        allowPrinting: !kIsWeb,
                       ),
                     ),
                   ],
@@ -104,6 +162,88 @@ class JibangPreviewView extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+Future<void> _export(
+  BuildContext context, {
+  required JibangPdfService pdf,
+  required List<JibangPersonText> people,
+  required bool useHanja,
+  required bool print,
+}) async {
+  showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => const Center(
+      child: Card(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: CircularProgressIndicator(),
+        ),
+      ),
+    ),
+  );
+
+  var dialogOpen = true;
+  void closeDialog() {
+    if (!dialogOpen || !context.mounted) return;
+    dialogOpen = false;
+    Navigator.of(context, rootNavigator: true).pop();
+  }
+
+  try {
+    final bytes = await pdf.buildPdf(people: people, useHanja: useHanja);
+    closeDialog();
+    if (!context.mounted) return;
+
+    if (kIsWeb) {
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: Text(print ? '인쇄할 PDF' : 'PDF 저장'),
+          content: const Text(
+            '아래 버튼을 누르면 김가네_지방.pdf 파일이 저장됩니다. '
+            '저장한 파일을 열어 인쇄할 수 있습니다.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('닫기'),
+            ),
+            FilledButton(
+              onPressed: () async {
+                await Printing.sharePdf(
+                  bytes: bytes,
+                  filename: '김가네_지방.pdf',
+                );
+                if (dialogContext.mounted) {
+                  Navigator.of(dialogContext).pop();
+                }
+              },
+              child: const Text('PDF 저장하기'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    final ok = print
+        ? await pdf.printPdf(people: people, useHanja: useHanja)
+        : await pdf.savePdf(people: people, useHanja: useHanja);
+    if (!context.mounted) return;
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('인쇄 창을 열지 못했습니다.')),
+      );
+    }
+  } catch (error) {
+    closeDialog();
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('지방 PDF를 만들지 못했습니다. $error')),
     );
   }
 }

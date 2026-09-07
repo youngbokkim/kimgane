@@ -50,6 +50,12 @@ class FamilyMember {
     return '$bonGwan$surname씨';
   }
 
+  String? get birthDateLabel {
+    if (birthMonth == null || birthDay == null) return null;
+    final leap = birthCalendar == CalendarKind.lunar && birthLeapMonth ? '윤' : '';
+    return '${birthCalendar.label} $leap$birthMonth월 $birthDay일';
+  }
+
   FamilyMember copyWith({
     String? name,
     Gender? gender,

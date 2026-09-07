@@ -133,6 +133,60 @@ class ClanIntroContent {
       ],
     ),
     ClanPhotoSection(
+      id: 'gen36-back',
+      title: '가족묘 비석 · 36대 뒷면',
+      subtitle: '비를 세운 해와 자손의 이름',
+      assetPath: 'assets/images/family_stone_36_back.jpeg',
+      summary:
+          '36대 표석 뒷면(음기)입니다. 오른쪽이 앞이고, 아들·며느리·딸·사위·손자·손녀 순으로 '
+          '이어집니다. 2012년 5월에 세운 기록으로, 37대 뒷면과 같은 해입니다.',
+      lines: [
+        HanjaLine(
+          hanja: '二〇十二年五月 日',
+          hangul: '이공십이년 오월 일',
+          meaning: '서기 2012년 5월에 비를 세웠습니다. 날짜 칸은 비워 두는 경우가 많습니다.',
+        ),
+        HanjaLine(
+          hanja: '子 德萬  ·  子婦 吳利粉',
+          hangul: '자 덕만 · 자부 오이분',
+          meaning: '아들 덕만, 며느리 해주오씨 오이분입니다. 자(子)는 아들, 자부(子婦)는 며느리입니다.',
+        ),
+        HanjaLine(
+          hanja: '子 덕수  ·  子婦 함영희',
+          hangul: '자 덕수 · 자부 함영희',
+          meaning: '아들 덕수, 며느리 함영희입니다.',
+        ),
+        HanjaLine(
+          hanja: '女 덕순  ·  壻 박창덕',
+          hangul: '녀 덕순 · 서 박창덕',
+          meaning: '딸 덕순과 사위 박창덕입니다. 여(女)는 딸, 서(壻)는 사위입니다.',
+        ),
+        HanjaLine(
+          hanja: '女 덕귀  ·  壻 조현일',
+          hangul: '녀 덕귀 · 서 조현일',
+          meaning: '딸 덕귀와 사위 조현일입니다.',
+        ),
+        HanjaLine(
+          hanja: '孫 영필 영태 영옥 영복 영준',
+          hangul: '손 영필 · 영태 · 영옥 · 영복 · 영준',
+          meaning: '손자 영필·영태·영옥·영복·영준입니다. 손(孫)은 손자입니다.',
+        ),
+        HanjaLine(
+          hanja: '孫女 점이 광순 순화',
+          hangul: '손녀 점이 · 광순 · 순화',
+          meaning: '손녀 점이·광순·순화입니다. 손녀(孫女)는 손녀입니다.',
+        ),
+      ],
+      glossary: [
+        HanjaLine(hanja: '子', hangul: '자', meaning: '아들'),
+        HanjaLine(hanja: '子婦', hangul: '자부', meaning: '며느리'),
+        HanjaLine(hanja: '女', hangul: '여', meaning: '딸'),
+        HanjaLine(hanja: '壻', hangul: '서', meaning: '사위'),
+        HanjaLine(hanja: '孫', hangul: '손', meaning: '손자'),
+        HanjaLine(hanja: '孫女', hangul: '손녀', meaning: '손녀'),
+      ],
+    ),
+    ClanPhotoSection(
       id: 'gen37-front',
       title: '가족묘 비석 · 37대 앞면',
       subtitle: '37世 김덕만 · 배위 해주오씨',
@@ -188,9 +242,14 @@ class ClanIntroContent {
           meaning: '아들 영필, 며느리 김영숙입니다. 자(子)는 아들, 자부(子婦)는 며느리입니다.',
         ),
         HanjaLine(
-          hanja: '永泰  ·  永玉  ·  壻 李秀珍',
-          hangul: '영태 · 영옥 · 서 이수진',
-          meaning: '자손 영태·영옥과, 사위 이수진입니다. 서(壻)는 사위입니다.',
+          hanja: '永泰',
+          hangul: '영태',
+          meaning: '아들 영태입니다. 배위는 적지 않고 홀로 새겼습니다.',
+        ),
+        HanjaLine(
+          hanja: '子 永玉  ·  子婦 李秀珍',
+          hangul: '자 영옥 · 자부 이수진',
+          meaning: '아들 영옥, 며느리 이수진입니다. 자(子)는 아들, 자부(子婦)는 며느리입니다.',
         ),
         HanjaLine(
           hanja: '女 점이  ·  壻 윤재원  ·  광순  ·  이춘근',
