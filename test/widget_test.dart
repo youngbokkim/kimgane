@@ -74,10 +74,7 @@ void main() {
   });
 
   test('축문 세로줄은 칸이 차면 다음 줄로 넘어간다', () {
-    const text = ChukmunText(
-      columns: ['가나다라마바사'],
-      plainText: '가나다라마바사',
-    );
+    const text = ChukmunText(columns: ['가나다라마바사'], plainText: '가나다라마바사');
     expect(text.verticalLines(maxCharsPerColumn: 3), [
       ['가', '나', '다'],
       ['라', '마', '바'],
@@ -86,10 +83,7 @@ void main() {
   });
 
   test('축문 세로줄은 띄어쓰기를 칸으로 남긴다', () {
-    const text = ChukmunText(
-      columns: ['효손 영필이'],
-      plainText: '효손 영필이',
-    );
+    const text = ChukmunText(columns: ['효손 영필이'], plainText: '효손 영필이');
     expect(text.charsOf('효손 영필이'), ['효', '손', ' ', '영', '필', '이']);
   });
 
@@ -113,10 +107,19 @@ void main() {
     );
     final lines = text.verticalLines(maxCharsPerColumn: fit.maxCharsPerColumn);
     final usedWidth = lines.length * (fit.columnWidth + fit.columnGap);
-    final usedHeight = text.longestLineLength * fit.charHeight;
-    expect(usedWidth, lessThanOrEqualTo(innerWidth + 0.5));
-    expect(usedHeight, lessThanOrEqualTo(innerHeight + 0.5));
-    expect(lines.length, text.lineCount);
+    var usedHeight = 0.0;
+    for (final line in lines) {
+      var height = 0.0;
+      for (final ch in line) {
+        height += fit.heightOf(ch);
+      }
+      if (height > usedHeight) usedHeight = height;
+    }
+    expect(usedWidth, lessThanOrEqualTo(innerWidth));
+    expect(usedHeight, lessThanOrEqualTo(innerHeight));
+    expect(usedHeight, greaterThan(innerHeight * 0.8));
+    expect(usedWidth, greaterThan(innerWidth * 0.7));
+    expect(fit.fontSize, greaterThan(20));
   });
 
   test('생존 가족은 기타 대신 생일을 보여 준다', () {

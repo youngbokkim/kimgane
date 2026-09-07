@@ -5,11 +5,7 @@ import 'package:kimgane/core/theme/app_theme.dart';
 import 'package:kimgane/core/utils/chukmun_composer.dart';
 
 class ChukmunPaper extends StatelessWidget {
-  const ChukmunPaper({
-    super.key,
-    required this.chukmun,
-    this.height = 300,
-  });
+  const ChukmunPaper({super.key, required this.chukmun, this.height = 300});
 
   final ChukmunText chukmun;
   final double height;
@@ -30,7 +26,9 @@ class ChukmunPaper extends StatelessWidget {
       innerWidth: innerWidth,
       innerHeight: innerHeight,
     );
-    final lines = chukmun.verticalLines(maxCharsPerColumn: fit.maxCharsPerColumn);
+    final lines = chukmun.verticalLines(
+      maxCharsPerColumn: fit.maxCharsPerColumn,
+    );
 
     return Center(
       child: Container(
@@ -48,6 +46,7 @@ class ChukmunPaper extends StatelessWidget {
           ],
         ),
         padding: _padding,
+        clipBehavior: Clip.hardEdge,
         child: Align(
           alignment: Alignment.topRight,
           child: Row(
@@ -64,9 +63,7 @@ class ChukmunPaper extends StatelessWidget {
                       for (final ch in line)
                         SizedBox(
                           width: fit.columnWidth,
-                          height: ch.trim().isEmpty
-                              ? fit.charHeight * 0.55
-                              : fit.charHeight,
+                          height: fit.heightOf(ch),
                           child: ch.trim().isEmpty
                               ? null
                               : Center(

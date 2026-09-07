@@ -19,7 +19,9 @@ class JibangPreviewView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(jibangViewModelProvider);
     final members = ref.watch(membersViewModelProvider);
-    final selected = members.where((m) => state.selectedIds.contains(m.id)).toList();
+    final selected = members
+        .where((m) => state.selectedIds.contains(m.id))
+        .toList();
     final texts = ref.watch(jibangComposerProvider).pairFor(selected);
     final chukmun = _composeChukmun(ref, selected);
     final pdf = JibangPdfService()..warmUp();
@@ -183,8 +185,10 @@ class JibangPreviewView extends ConsumerWidget {
                           chukmun: chukmun,
                         ),
                         pdfFileName: '김가네_지방_축문.pdf',
-                        initialPageFormat: PdfPageFormat.a4,
+                        initialPageFormat: PdfPageFormat.a4.landscape,
                         canChangeOrientation: false,
+                        canChangePageFormat: false,
+                        dynamicLayout: false,
                         allowPrinting: !kIsWeb,
                       ),
                     ),
@@ -201,10 +205,9 @@ class JibangPreviewView extends ConsumerWidget {
 
 ChukmunText _composeChukmun(WidgetRef ref, List<FamilyMember> selected) {
   final events = ref.watch(eventsViewModelProvider);
-  return ref.watch(chukmunComposerProvider).compose(
-    ancestors: selected,
-    events: events,
-  );
+  return ref
+      .watch(chukmunComposerProvider)
+      .compose(ancestors: selected, events: events);
 }
 
 Future<void> _export(
@@ -277,19 +280,27 @@ Future<void> _export(
     }
 
     final ok = print
-        ? await pdf.printPdf(people: people, useHanja: useHanja, chukmun: chukmun)
-        : await pdf.savePdf(people: people, useHanja: useHanja, chukmun: chukmun);
+        ? await pdf.printPdf(
+            people: people,
+            useHanja: useHanja,
+            chukmun: chukmun,
+          )
+        : await pdf.savePdf(
+            people: people,
+            useHanja: useHanja,
+            chukmun: chukmun,
+          );
     if (!context.mounted) return;
     if (!ok) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('인쇄 창을 열지 못했습니다.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('인쇄 창을 열지 못했습니다.')));
     }
   } catch (error) {
     closeDialog();
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('지방·축문 PDF를 만들지 못했습니다. $error')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('지방·축문 PDF를 만들지 못했습니다. $error')));
   }
 }

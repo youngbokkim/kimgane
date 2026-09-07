@@ -4,18 +4,13 @@ import 'package:kimgane/data/models/family_event.dart';
 import 'package:kimgane/data/models/family_member.dart';
 
 class ChukmunText {
-  const ChukmunText({
-    required this.columns,
-    required this.plainText,
-  });
+  const ChukmunText({required this.columns, required this.plainText});
 
   final List<String> columns;
   final String plainText;
 
   List<String> charsOf(String column) {
-    return [
-      for (final rune in column.trim().runes) String.fromCharCode(rune),
-    ];
+    return [for (final rune in column.trim().runes) String.fromCharCode(rune)];
   }
 
   int get lineCount => columns.where((c) => charsOf(c).isNotEmpty).length;
@@ -54,19 +49,25 @@ class ChukmunFit {
     required this.maxCharsPerColumn,
   });
 
+  static const spaceHeightFactor = 0.55;
+
   final double fontSize;
   final double charHeight;
   final double columnWidth;
   final double columnGap;
   final int maxCharsPerColumn;
 
-  /// A4 가로 한 장에 모든 세로줄이 들어가도록 글자 크기를 줄인다.
+  double heightOf(String ch) {
+    return ch.trim().isEmpty ? charHeight * spaceHeightFactor : charHeight;
+  }
+
+  /// A4 가로 한 장의 안쪽 영역에 맞게, 들어갈 수 있는 가장 큰 글자 크기를 고른다.
   /// 글자 간격은 페이지를 채우려고 늘리지 않는다.
   factory ChukmunFit.forPage({
     required ChukmunText text,
     required double innerWidth,
     required double innerHeight,
-    double maxFontSize = 15,
+    double maxFontSize = 42,
     double minFontSize = 9,
     bool brush = false,
   }) {
@@ -82,23 +83,53 @@ class ChukmunFit {
       );
     }
 
-    final heightFactor = brush ? 1.32 : 1.2;
-    final widthPitch = brush ? 1.9 : 1.65;
+    final heightFactor = brush ? 1.28 : 1.12;
+    final widthFactor = brush ? 1.4 : 1.18;
+    final gapFactor = brush ? 0.42 : 0.32;
     final cap = brush ? 14.0 : maxFontSize;
-    final byHeight = innerHeight / (longest * heightFactor);
-    final byWidth = innerWidth / (lines * widthPitch);
-    var font = byHeight < byWidth ? byHeight : byWidth;
-    if (font > cap) font = cap;
-    if (font < minFontSize) font = minFontSize;
 
-    final charHeight = font * (brush ? 1.28 : 1.18);
-    return ChukmunFit(
-      fontSize: font,
-      charHeight: charHeight,
-      columnWidth: font * (brush ? 1.4 : 1.22),
-      columnGap: font * (brush ? 0.42 : 0.38),
-      maxCharsPerColumn: (innerHeight / charHeight).floor().clamp(1, 1000),
-    );
+    ChukmunFit at(double font) {
+      final charHeight = font * heightFactor;
+      return ChukmunFit(
+        fontSize: font,
+        charHeight: charHeight,
+        columnWidth: font * widthFactor,
+        columnGap: font * gapFactor,
+        maxCharsPerColumn: (innerHeight / charHeight).floor().clamp(1, 1000),
+      );
+    }
+
+    bool fits(ChukmunFit fit) {
+      final packed = text.verticalLines(
+        maxCharsPerColumn: fit.maxCharsPerColumn,
+      );
+      if (packed.isEmpty) return true;
+      final usedWidth = packed.length * (fit.columnWidth + fit.columnGap);
+      var usedHeight = 0.0;
+      for (final line in packed) {
+        var height = 0.0;
+        for (final ch in line) {
+          height += fit.heightOf(ch);
+        }
+        if (height > usedHeight) usedHeight = height;
+      }
+      return usedWidth <= innerWidth && usedHeight <= innerHeight;
+    }
+
+    var lo = minFontSize;
+    var hi = cap;
+    var best = at(minFontSize);
+    for (var i = 0; i < 24; i++) {
+      final mid = (lo + hi) / 2;
+      final candidate = at(mid);
+      if (fits(candidate)) {
+        best = candidate;
+        lo = mid;
+      } else {
+        hi = mid;
+      }
+    }
+    return best;
   }
 }
 
@@ -181,10 +212,11 @@ class ChukmunComposer {
     if (ancestors.isEmpty) {
       return const ChukmunText(columns: [], plainText: '');
     }
-    final people = [...ancestors]..sort((a, b) {
-      if (a.isMale == b.isMale) return 0;
-      return a.isMale ? -1 : 1;
-    });
+    final people = [...ancestors]
+      ..sort((a, b) {
+        if (a.isMale == b.isMale) return 0;
+        return a.isMale ? -1 : 1;
+      });
     final today = now ?? DateTime.now();
     final date = _riteDate(people, events, today);
     final dateLabel =
@@ -200,10 +232,7 @@ class ChukmunComposer {
       shortNames: shortNames,
       honorifics: honorifics,
     );
-    return ChukmunText(
-      columns: columns,
-      plainText: columns.join('\n'),
-    );
+    return ChukmunText(columns: columns, plainText: columns.join('\n'));
   }
 
   List<String> _columns({
