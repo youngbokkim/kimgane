@@ -1,0 +1,55 @@
+name: kimgane
+description: 광산김씨 김가네 가족 생일·제사·경조사 일정
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_riverpod: ^2.6.1
+  go_router: ^15.1.2
+  intl: ^0.20.2
+  korean_lunar_utils: ^1.0.1
+  uuid: ^4.5.1
+  shared_preferences: ^2.5.3
+  printing: ^5.14.2
+  pdf: ^3.11.3
+  table_calendar: ^3.2.0
+  collection: ^1.19.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/fonts/
+    - assets/images/jikgye_seonjo_myobi.jpeg
+    - assets/images/family_stone_36_front.jpeg
+    - assets/images/family_stone_37_front.jpeg
+    - assets/images/family_stone_37_back.jpeg
+    - assets/images/jesa_chukmun.jpeg
+    - assets/images/jesa_sangcharim.jpeg
+  fonts:
+    - family: NanumMyeongjo
+      fonts:
+        - asset: assets/fonts/NanumMyeongjo-Regular.ttf
+        - asset: assets/fonts/NanumMyeongjo-Bold.ttf
+          weight: 700
+    - family: NanumGothic
+      fonts:
+        - asset: assets/fonts/NanumGothic-Regular.ttf
+        - asset: assets/fonts/NanumGothic-Bold.ttf
+          weight: 700
+    - family: NotoSerifKR
+      fonts:
+        - asset: assets/fonts/NotoSerifKR-Hanja.ttf
+          weight: 700
