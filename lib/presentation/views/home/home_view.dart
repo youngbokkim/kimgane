@@ -101,7 +101,7 @@ class HomeView extends ConsumerWidget {
               Expanded(
                 child: _Quick(
                   icon: Icons.edit_document,
-                  label: '지방 쓰기',
+                  label: '지방 · 축문',
                   onTap: () => context.push('/jibang'),
                 ),
               ),
@@ -118,11 +118,11 @@ class HomeView extends ConsumerWidget {
           const SizedBox(height: 20),
           SectionCard(
             title: '광산김씨',
-            subtitle: '의성 가족묘 · 선조 벼슬 · 축문',
+            subtitle: '의성 가족묘 · 선조 벼슬',
             onTap: () => context.push('/clan'),
             trailing: const Icon(Icons.chevron_right),
             child: const Text(
-              '직계선조 묘비와 36대·37대 비석, 할아버지·할머니 제사 축문을 한글로 풀어 두었습니다.',
+              '직계선조 묘비와 36대·37대 비석을 한글로 풀어 두었습니다.',
             ),
           ),
           const SizedBox(height: 12),

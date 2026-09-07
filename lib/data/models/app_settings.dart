@@ -34,7 +34,7 @@ class AppSettings {
 
   factory AppSettings.fromJson(Map<String, dynamic> json) {
     return AppSettings(
-      officiantId: json['officiantId'] as String? ?? SeedIds.officiant,
+      officiantId: SeedIds.officiant,
       defaultBonGwan: json['defaultBonGwan'] as String? ?? '광산',
       defaultSurname: json['defaultSurname'] as String? ?? '김',
       hometown: json['hometown'] as String? ?? '경상북도 의성',
@@ -43,7 +43,7 @@ class AppSettings {
 }
 
 class SeedIds {
-  static const officiant = 'member-deoksu';
+  static const officiant = 'member-yeongpil';
   static const grandfather = 'member-myeongryong';
   static const grandmother = 'member-cheonbun';
   static const deokman = 'member-deokman';

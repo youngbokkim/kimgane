@@ -124,7 +124,7 @@ class EventDetailView extends ConsumerWidget {
                           context.push('/jibang');
                         },
                         icon: const Icon(Icons.edit_document),
-                        label: const Text('지방 미리보기'),
+                        label: const Text('지방 · 축문'),
                       ),
                       OutlinedButton.icon(
                         onPressed: () => context.push('/offering'),

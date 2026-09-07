@@ -12,7 +12,7 @@ class LocalStore {
   static const settingsKey = 'kimgane.settings';
   static const seededKey = 'kimgane.seeded';
   static const seedVersionKey = 'kimgane.seedVersion';
-  static const currentSeedVersion = 2;
+  static const currentSeedVersion = 3;
 
   bool get isSeeded {
     final version = _prefs.getInt(seedVersionKey) ?? 0;

@@ -26,22 +26,22 @@ class RiteHubView extends StatelessWidget {
           const SizedBox(height: 16),
           SectionCard(
             title: '광산김씨 소개',
-            subtitle: '의성 가족묘 비석 · 벼슬 · 축문',
+            subtitle: '의성 가족묘 비석 · 벼슬',
             onTap: () => context.push('/clan'),
             trailing: const Icon(Icons.chevron_right),
             child: const Text(
-              '직계선조 묘비의 벼슬과 36·37대 가족묘 비석, 할아버지·할머니 제사 축문을 '
+              '직계선조 묘비의 벼슬과 36·37대 가족묘 비석을 '
               '사진과 한글 풀이로 봅니다.',
             ),
           ),
           const SizedBox(height: 12),
           SectionCard(
-            title: '지방 미리보기 · 출력',
+            title: '지방 · 축문 쓰기',
             subtitle: '한지 규격 6×22cm · 고위 左 / 비위 右',
             onTap: () => context.push('/jibang'),
             trailing: const Icon(Icons.chevron_right),
             child: const Text(
-              '제사 대상 조상을 고르면 한자·한글 지방을 세로로 보여 주고, '
+              '제사 대상 조상을 고르면 한자·한글 지방과 한글 축문을 세로로 보여 주고, '
               '웹과 앱에서 그대로 인쇄할 수 있습니다.',
             ),
           ),

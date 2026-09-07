@@ -33,7 +33,7 @@ class ClanPhotoSection {
 class ClanIntroContent {
   static const intro =
       '광산김씨(光山金氏) 김가네 직계는 경상북도 의성 선영을 모십니다. '
-      '아래 사진은 현재 가족묘의 비석과, 제사 때 할아버지·할머니께 올린 축문입니다. '
+      '아래 사진은 현재 가족묘의 비석입니다. '
       '한문은 오른쪽에서 왼쪽으로 세로로 읽습니다. 판독이 족보와 다르면 족보를 따릅니다.';
 
   static const sections = <ClanPhotoSection>[
@@ -269,57 +269,6 @@ class ClanIntroContent {
         HanjaLine(hanja: '壻', hangul: '서', meaning: '사위'),
         HanjaLine(hanja: '孫', hangul: '손', meaning: '손자'),
         HanjaLine(hanja: '孫女', hangul: '손녀', meaning: '손녀'),
-      ],
-    ),
-    ClanPhotoSection(
-      id: 'chukmun',
-      title: '제사 축문',
-      subtitle: '할아버지·할머니 기제에 올린 글',
-      assetPath: 'assets/images/jesa_chukmun.jpeg',
-      summary:
-          '묘소 앞에서 할아버지·할머니께 고할 때 쓴 축문입니다. 한문 축문을 한글로 풀어 쓴 글로, '
-          '오른쪽부터 세로로 읽습니다. 효손 영필이 제주가 되어 기일을 알리고 술과 음식을 올리며 흠향을 청합니다.',
-      lines: [
-        HanjaLine(
-          hanja: '丙午年 七月 二十五日',
-          hangul: '병오년 칠월 스무닷새',
-          meaning:
-              '병오년(丙午年) 음력 7월 25일입니다. 육십갑자로 해를 적는 제사 축문의 첫머리입니다.',
-        ),
-        HanjaLine(
-          hanja: '孝孫 永弼',
-          hangul: '효손 영필이 할아버지 할머님께 고하옵니다',
-          meaning: '효손(孝孫)은 효성을 다하는 손자라는 뜻입니다. 제주 영필이 조부모께 아뢰는 인사입니다.',
-        ),
-        HanjaLine(
-          hanja: '忌日',
-          hangul: '세월이 흘러 할아버님 할머님의 기일이 도래하였네요',
-          meaning: '기일(忌日)은 돌아가신 날입니다. 한 해가 돌아와 제사를 올리게 되었음을 고합니다.',
-        ),
-        HanjaLine(
-          hanja: '恩功',
-          hangul: '생전에 할아버님과 할머님의 은공을 갚을 길이 없사옵니다',
-          meaning: '은공(恩功)은 끼쳐 주신 은혜와 공덕입니다. 다 갚을 수 없음을 아뢰는 대목입니다.',
-        ),
-        HanjaLine(
-          hanja: '歆饗',
-          hangul: '이에 후손들이 여러가지 음식과 맑은 술을 올리오니 흠향 하시옵소서',
-          meaning:
-              '흠향(歆饗)은 조상께서 제물을 흠향하신다는 말입니다. 잡수시고 받아 달라는 청입니다.',
-        ),
-        HanjaLine(
-          hanja: '保佑',
-          hangul: '할아버지 할머님 저희 집안을 두루두루 살펴 주시옵소서',
-          meaning: '자손을 보살펴 달라는 기원의 맺음입니다. 전통 축문의 보호(保佑)에 해당하는 뜻입니다.',
-        ),
-      ],
-      glossary: [
-        HanjaLine(hanja: '軸文 / 祝文', hangul: '축문', meaning: '제사 때 조상께 고하는 글.'),
-        HanjaLine(hanja: '孝孫', hangul: '효손', meaning: '제사를 주관하는 손자.'),
-        HanjaLine(hanja: '告', hangul: '고하다', meaning: '신위 앞에 아뢰다.'),
-        HanjaLine(hanja: '忌日', hangul: '기일', meaning: '돌아가신 날.'),
-        HanjaLine(hanja: '恩功', hangul: '은공', meaning: '은혜와 공덕.'),
-        HanjaLine(hanja: '歆饗', hangul: '흠향', meaning: '제물을 받아 누리심.'),
       ],
     ),
   ];

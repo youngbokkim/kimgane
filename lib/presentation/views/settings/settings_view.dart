@@ -10,29 +10,19 @@ class SettingsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsViewModelProvider);
-    final members = ref.watch(membersViewModelProvider);
-    final living = members.where((m) => !m.isDeceased).toList();
 
     return Scaffold(
       appBar: AppBar(title: const Text('설정')),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          DropdownButtonFormField<String>(
-            initialValue: living.any((m) => m.id == settings.officiantId)
-                ? settings.officiantId
-                : (living.isEmpty ? null : living.first.id),
-            decoration: const InputDecoration(labelText: '제주'),
-            items: [
-              for (final member in living)
-                DropdownMenuItem(value: member.id, child: Text(member.name)),
-            ],
-            onChanged: (id) {
-              if (id == null) return;
-              ref
-                  .read(settingsViewModelProvider.notifier)
-                  .update(settings.copyWith(officiantId: id));
-            },
+          TextFormField(
+            initialValue: '김영필',
+            enabled: false,
+            decoration: const InputDecoration(
+              labelText: '제주',
+              helperText: '제주는 장손 김영필로 고정입니다.',
+            ),
           ),
           const SizedBox(height: 12),
           TextFormField(
@@ -62,7 +52,7 @@ class SettingsView extends ConsumerWidget {
           ListTile(
             contentPadding: EdgeInsets.zero,
             title: const Text('광산김씨 소개'),
-            subtitle: const Text('가족묘 비석 · 벼슬 · 축문 한글 풀이'),
+            subtitle: const Text('가족묘 비석 · 벼슬 한글 풀이'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/clan'),
           ),

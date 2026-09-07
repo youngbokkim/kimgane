@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kimgane/core/utils/chukmun_composer.dart';
 import 'package:kimgane/core/utils/jibang_composer.dart';
 import 'package:kimgane/core/utils/occurrence_service.dart';
 import 'package:kimgane/data/models/app_settings.dart';
@@ -28,6 +29,10 @@ final occurrenceServiceProvider = Provider<OccurrenceService>((ref) {
 
 final jibangComposerProvider = Provider<JibangComposer>((ref) {
   return JibangComposer();
+});
+
+final chukmunComposerProvider = Provider<ChukmunComposer>((ref) {
+  return ChukmunComposer(ref.watch(lunarServiceProvider));
 });
 
 final membersViewModelProvider =
@@ -106,8 +111,9 @@ class SettingsViewModel extends Notifier<AppSettings> {
   AppSettings build() => ref.read(settingsRepositoryProvider).load();
 
   Future<void> update(AppSettings settings) async {
-    state = settings;
-    await ref.read(settingsRepositoryProvider).save(settings);
+    final next = settings.copyWith(officiantId: SeedIds.officiant);
+    state = next;
+    await ref.read(settingsRepositoryProvider).save(next);
   }
 }
 

@@ -2,9 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kimgane/core/theme/app_theme.dart';
+import 'package:kimgane/core/utils/chukmun_composer.dart';
 import 'package:kimgane/core/utils/jibang_composer.dart';
 import 'package:kimgane/core/utils/jibang_pdf_service.dart';
+import 'package:kimgane/data/models/family_member.dart';
 import 'package:kimgane/presentation/viewmodels/app_view_models.dart';
+import 'package:kimgane/presentation/widgets/chukmun_paper.dart';
 import 'package:kimgane/presentation/widgets/jibang_paper.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
@@ -18,18 +21,19 @@ class JibangPreviewView extends ConsumerWidget {
     final members = ref.watch(membersViewModelProvider);
     final selected = members.where((m) => state.selectedIds.contains(m.id)).toList();
     final texts = ref.watch(jibangComposerProvider).pairFor(selected);
+    final chukmun = _composeChukmun(ref, selected);
     final pdf = JibangPdfService()..warmUp();
 
     if (texts.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('지방 미리보기')),
+        appBar: AppBar(title: const Text('지방 · 축문 미리보기')),
         body: const Center(child: Text('선택된 조상이 없습니다.')),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('지방 미리보기'),
+        title: const Text('지방 · 축문 미리보기'),
         actions: [
           IconButton(
             tooltip: 'PDF 저장',
@@ -37,6 +41,7 @@ class JibangPreviewView extends ConsumerWidget {
               context,
               pdf: pdf,
               people: texts,
+              chukmun: chukmun,
               useHanja: state.useHanja,
               print: false,
             ),
@@ -48,6 +53,7 @@ class JibangPreviewView extends ConsumerWidget {
               context,
               pdf: pdf,
               people: texts,
+              chukmun: chukmun,
               useHanja: state.useHanja,
               print: true,
             ),
@@ -60,8 +66,8 @@ class JibangPreviewView extends ConsumerWidget {
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
             child: Text(
-              '화면에서 확인하고, 인쇄하면 A4에 6×22cm 규격으로 나갑니다. '
-              '위를 둥글게 오리고 제사가 끝나면 소각합니다.',
+              '화면에서 확인하고, 인쇄하면 지방은 A4에 6×22cm 규격으로, 축문은 다음 장에 나갑니다. '
+              '지방은 위를 둥글게 오리고 제사가 끝나면 소각합니다.',
               style: TextStyle(color: AppColors.inkMuted),
             ),
           ),
@@ -77,12 +83,24 @@ class JibangPreviewView extends ConsumerWidget {
                         useHanja: state.useHanja,
                         height: 460,
                       ),
+                      const SizedBox(height: 24),
+                      const Text(
+                        '축문',
+                        style: TextStyle(
+                          fontFamily: 'NanumMyeongjo',
+                          fontWeight: FontWeight.w700,
+                          fontSize: 18,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      ChukmunPaper(chukmun: chukmun),
                       const SizedBox(height: 16),
                       FilledButton.icon(
                         onPressed: () => _export(
                           context,
                           pdf: pdf,
                           people: texts,
+                          chukmun: chukmun,
                           useHanja: state.useHanja,
                           print: false,
                         ),
@@ -95,6 +113,7 @@ class JibangPreviewView extends ConsumerWidget {
                           context,
                           pdf: pdf,
                           people: texts,
+                          chukmun: chukmun,
                           useHanja: state.useHanja,
                           print: true,
                         ),
@@ -115,12 +134,24 @@ class JibangPreviewView extends ConsumerWidget {
                             useHanja: state.useHanja,
                             height: 520,
                           ),
+                          const SizedBox(height: 24),
+                          const Text(
+                            '축문',
+                            style: TextStyle(
+                              fontFamily: 'NanumMyeongjo',
+                              fontWeight: FontWeight.w700,
+                              fontSize: 18,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          ChukmunPaper(chukmun: chukmun, height: 460),
                           const SizedBox(height: 16),
                           FilledButton.icon(
                             onPressed: () => _export(
                               context,
                               pdf: pdf,
                               people: texts,
+                              chukmun: chukmun,
                               useHanja: state.useHanja,
                               print: false,
                             ),
@@ -133,6 +164,7 @@ class JibangPreviewView extends ConsumerWidget {
                               context,
                               pdf: pdf,
                               people: texts,
+                              chukmun: chukmun,
                               useHanja: state.useHanja,
                               print: true,
                             ),
@@ -148,8 +180,9 @@ class JibangPreviewView extends ConsumerWidget {
                         build: (format) => pdf.buildPdf(
                           people: texts,
                           useHanja: state.useHanja,
+                          chukmun: chukmun,
                         ),
-                        pdfFileName: '김가네_지방.pdf',
+                        pdfFileName: '김가네_지방_축문.pdf',
                         initialPageFormat: PdfPageFormat.a4,
                         canChangeOrientation: false,
                         allowPrinting: !kIsWeb,
@@ -166,10 +199,19 @@ class JibangPreviewView extends ConsumerWidget {
   }
 }
 
+ChukmunText _composeChukmun(WidgetRef ref, List<FamilyMember> selected) {
+  final events = ref.watch(eventsViewModelProvider);
+  return ref.watch(chukmunComposerProvider).compose(
+    ancestors: selected,
+    events: events,
+  );
+}
+
 Future<void> _export(
   BuildContext context, {
   required JibangPdfService pdf,
   required List<JibangPersonText> people,
+  required ChukmunText chukmun,
   required bool useHanja,
   required bool print,
 }) async {
@@ -194,7 +236,11 @@ Future<void> _export(
   }
 
   try {
-    final bytes = await pdf.buildPdf(people: people, useHanja: useHanja);
+    final bytes = await pdf.buildPdf(
+      people: people,
+      useHanja: useHanja,
+      chukmun: chukmun,
+    );
     closeDialog();
     if (!context.mounted) return;
 
@@ -204,8 +250,8 @@ Future<void> _export(
         builder: (dialogContext) => AlertDialog(
           title: Text(print ? '인쇄할 PDF' : 'PDF 저장'),
           content: const Text(
-            '아래 버튼을 누르면 김가네_지방.pdf 파일이 저장됩니다. '
-            '저장한 파일을 열어 인쇄할 수 있습니다.',
+            '아래 버튼을 누르면 김가네_지방_축문.pdf 파일이 저장됩니다. '
+            '1장은 지방, 2장은 축문입니다. 저장한 파일을 열어 인쇄할 수 있습니다.',
           ),
           actions: [
             TextButton(
@@ -216,7 +262,7 @@ Future<void> _export(
               onPressed: () async {
                 await Printing.sharePdf(
                   bytes: bytes,
-                  filename: '김가네_지방.pdf',
+                  filename: '김가네_지방_축문.pdf',
                 );
                 if (dialogContext.mounted) {
                   Navigator.of(dialogContext).pop();
@@ -231,8 +277,8 @@ Future<void> _export(
     }
 
     final ok = print
-        ? await pdf.printPdf(people: people, useHanja: useHanja)
-        : await pdf.savePdf(people: people, useHanja: useHanja);
+        ? await pdf.printPdf(people: people, useHanja: useHanja, chukmun: chukmun)
+        : await pdf.savePdf(people: people, useHanja: useHanja, chukmun: chukmun);
     if (!context.mounted) return;
     if (!ok) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -243,7 +289,7 @@ Future<void> _export(
     closeDialog();
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('지방 PDF를 만들지 못했습니다. $error')),
+      SnackBar(content: Text('지방·축문 PDF를 만들지 못했습니다. $error')),
     );
   }
 }

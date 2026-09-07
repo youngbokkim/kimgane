@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:kimgane/core/utils/chukmun_composer.dart';
 import 'package:kimgane/core/utils/jibang_composer.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -39,6 +40,7 @@ class JibangPdfService {
   Future<Uint8List> buildPdf({
     required List<JibangPersonText> people,
     required bool useHanja,
+    ChukmunText? chukmun,
   }) async {
     final fonts = await _fonts();
     final fallback = [fonts.hanja, fonts.base, fonts.bold];
@@ -87,6 +89,42 @@ class JibangPdfService {
         },
       ),
     );
+
+    if (chukmun != null && chukmun.columns.isNotEmpty) {
+      doc.addPage(
+        pw.Page(
+          pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+          build: (context) {
+            return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text(
+                  '김가네 축문',
+                  style: _style(fonts.bold, fallback, 18),
+                ),
+                pw.SizedBox(height: 6),
+                pw.Text(
+                  '오른쪽부터 세로로 읽습니다. 제주 김영필이 고하는 한글 축문입니다.',
+                  style: _style(fonts.base, fallback, 10).copyWith(lineSpacing: 4),
+                ),
+                pw.SizedBox(height: 20),
+                pw.Expanded(
+                  child: pw.Center(
+                    child: _chukmunPaper(chukmun, fonts.bold, fallback),
+                  ),
+                ),
+                pw.Text(
+                  '광산김씨 · 경상북도 의성 가례 기준 안내. 집안 홀기가 있으면 홀기를 따릅니다.',
+                  style: _style(fonts.base, fallback, 9)
+                      .copyWith(color: PdfColors.grey700),
+                ),
+              ],
+            );
+          },
+        ),
+      );
+    }
 
     return doc.save();
   }
@@ -137,33 +175,83 @@ class JibangPdfService {
     );
   }
 
+  pw.Widget _chukmunPaper(
+    ChukmunText chukmun,
+    pw.Font bold,
+    List<pw.Font> fallback,
+  ) {
+    final columns = [
+      for (final column in chukmun.columns)
+        [
+          for (final rune in column.runes)
+            String.fromCharCode(rune),
+        ].where((ch) => ch.trim().isNotEmpty).toList(),
+    ];
+    return pw.Container(
+      width: 170 * PdfPageFormat.mm,
+      height: 210 * PdfPageFormat.mm,
+      decoration: pw.BoxDecoration(
+        color: PdfColor.fromInt(0xFFFFF8EA),
+        border: pw.Border.all(width: 0.8),
+      ),
+      padding: const pw.EdgeInsets.fromLTRB(10, 16, 10, 12),
+      child: pw.Row(
+        children: [
+          for (final column in columns.reversed)
+            pw.Expanded(
+              child: pw.Padding(
+                padding: const pw.EdgeInsets.symmetric(horizontal: 1),
+                child: pw.Column(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
+                  children: [
+                    for (final ch in column)
+                      pw.Text(ch, style: _style(bold, fallback, 11)),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   Future<bool> savePdf({
     required List<JibangPersonText> people,
     required bool useHanja,
+    ChukmunText? chukmun,
   }) async {
-    final bytes = await buildPdf(people: people, useHanja: useHanja);
+    final bytes = await buildPdf(
+      people: people,
+      useHanja: useHanja,
+      chukmun: chukmun,
+    );
     return Printing.sharePdf(
       bytes: bytes,
-      filename: '김가네_지방.pdf',
+      filename: '김가네_지방_축문.pdf',
     );
   }
 
   Future<bool> printPdf({
     required List<JibangPersonText> people,
     required bool useHanja,
+    ChukmunText? chukmun,
   }) async {
-    final bytes = await buildPdf(people: people, useHanja: useHanja);
+    final bytes = await buildPdf(
+      people: people,
+      useHanja: useHanja,
+      chukmun: chukmun,
+    );
     if (kIsWeb) {
       // Chrome blocks print() on a hidden iframe after async PDF generation,
       // so download the file and let the user open/print it.
       return Printing.sharePdf(
         bytes: bytes,
-        filename: '김가네_지방.pdf',
+        filename: '김가네_지방_축문.pdf',
       );
     }
     return Printing.layoutPdf(
       onLayout: (_) async => bytes,
-      name: '김가네_지방',
+      name: '김가네_지방_축문',
     );
   }
 }
