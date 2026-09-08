@@ -190,6 +190,13 @@ class JibangPreviewView extends ConsumerWidget {
                         canChangePageFormat: false,
                         dynamicLayout: false,
                         allowPrinting: !kIsWeb,
+                        padding: const EdgeInsets.fromLTRB(8, 8, 16, 12),
+                        previewPageMargin: const EdgeInsets.fromLTRB(
+                          12,
+                          8,
+                          20,
+                          16,
+                        ),
                       ),
                     ),
                   ],

@@ -83,9 +83,9 @@ class ChukmunFit {
       );
     }
 
-    final heightFactor = brush ? 1.28 : 1.12;
-    final widthFactor = brush ? 1.4 : 1.18;
-    final gapFactor = brush ? 0.42 : 0.32;
+    final heightFactor = brush ? 1.28 : 1.16;
+    final widthFactor = brush ? 1.4 : 1.36;
+    final gapFactor = brush ? 0.42 : 0.36;
     final cap = brush ? 14.0 : maxFontSize;
 
     ChukmunFit at(double font) {

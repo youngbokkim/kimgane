@@ -157,14 +157,14 @@ class ClanIntroContent {
           meaning: '아들 덕수, 며느리 함영희입니다.',
         ),
         HanjaLine(
-          hanja: '女 덕순  ·  壻 박창덕',
-          hangul: '녀 덕순 · 서 박창덕',
-          meaning: '딸 덕순과 사위 박창덕입니다. 여(女)는 딸, 서(壻)는 사위입니다.',
+          hanja: '女 덕귀  ·  壻 박창덕',
+          hangul: '녀 덕귀 · 서 박창덕',
+          meaning: '딸 덕귀와 사위 박창덕입니다. 여(女)는 딸, 서(壻)는 사위입니다.',
         ),
         HanjaLine(
-          hanja: '女 덕귀  ·  壻 조현일',
-          hangul: '녀 덕귀 · 서 조현일',
-          meaning: '딸 덕귀와 사위 조현일입니다.',
+          hanja: '女 순분  ·  壻 조현일',
+          hangul: '녀 순분 · 서 조현일',
+          meaning: '딸 순분과 사위 조현일입니다.',
         ),
         HanjaLine(
           hanja: '孫 영필 영태 영옥 영복 영준',

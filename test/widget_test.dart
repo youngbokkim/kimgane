@@ -32,6 +32,28 @@ void main() {
     expect(back.isLeapMonth, isFalse);
   });
 
+  test('양력 날짜의 음력이 하루 밀리지 않는다', () {
+    final lunar = LunarService();
+    final sept8 = lunar.solarToLunar(DateTime(2026, 9, 8));
+    expect(sept8.year, 2026);
+    expect(sept8.month, 7);
+    expect(sept8.day, 27);
+    expect(sept8.isLeapMonth, isFalse);
+
+    final utcDay = lunar.solarToLunar(DateTime.utc(2026, 9, 8));
+    expect(utcDay.month, 7);
+    expect(utcDay.day, 27);
+
+    expect(
+      lunar.lunarToSolar(year: 2026, month: 7, day: 27),
+      DateTime(2026, 9, 8),
+    );
+    expect(
+      lunar.lunarToSolar(year: 2026, month: 7, day: 14),
+      DateTime(2026, 8, 26),
+    );
+  });
+
   test('할아버지·할머니 지방 문구를 가례대로 만든다', () {
     final jibang = JibangComposer();
     final grandfather = SeedData.members().firstWhere(
@@ -98,8 +120,8 @@ void main() {
       events: SeedData.events(),
       now: DateTime(2026, 1, 1),
     );
-    const innerWidth = 785.0;
-    const innerHeight = 539.0;
+    const innerWidth = 740.0;
+    const innerHeight = 504.0;
     final fit = ChukmunFit.forPage(
       text: text,
       innerWidth: innerWidth,

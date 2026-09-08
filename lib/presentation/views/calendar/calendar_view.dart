@@ -29,9 +29,7 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
     final occ = ref.watch(occurrenceServiceProvider);
     final month = DateTime(_focused.year, _focused.month);
     final byDay = occ.byDay(events, month);
-    final monthEvents = byDay.entries
-        .expand((entry) => entry.value)
-        .toList()
+    final monthEvents = byDay.entries.expand((entry) => entry.value).toList()
       ..sort((a, b) => a.solarDate.compareTo(b.solarDate));
     final today = DateTime.now();
     final todayKey = DateTime(today.year, today.month, today.day);
@@ -40,7 +38,11 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
       return byDay[DateTime(day.year, day.month, day.day)] ?? const [];
     }
 
-    Widget dayCell(DateTime day, {required bool selected, required bool isToday}) {
+    Widget dayCell(
+      DateTime day, {
+      required bool selected,
+      required bool isToday,
+    }) {
       return _DayCell(
         day: day,
         lunarText: _lunarDay(lunar.solarToLunar(day)),
@@ -61,7 +63,7 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
             locale: 'ko_KR',
             firstDay: DateTime.utc(2000, 1, 1),
             lastDay: DateTime.utc(2049, 12, 31),
-            focusedDay: _focused,
+            focusedDay: DateTime(_focused.year, _focused.month, _focused.day),
             selectedDayPredicate: (day) => isSameDay(day, _selected),
             eventLoader: eventsOn,
             calendarFormat: CalendarFormat.month,
@@ -89,11 +91,8 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
                   dayCell(day, selected: false, isToday: false),
               todayBuilder: (context, day, focused) =>
                   dayCell(day, selected: false, isToday: true),
-              selectedBuilder: (context, day, focused) => dayCell(
-                day,
-                selected: true,
-                isToday: isSameDay(day, today),
-              ),
+              selectedBuilder: (context, day, focused) =>
+                  dayCell(day, selected: true, isToday: isSameDay(day, today)),
               outsideBuilder: (context, day, focused) =>
                   dayCell(day, selected: false, isToday: false),
               markerBuilder: (context, day, events) => const SizedBox.shrink(),
@@ -127,14 +126,17 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
                   for (final item in monthEvents)
                     _MonthEventTile(
                       occurrence: item,
-                      isToday: DateTime(
+                      isToday:
+                          DateTime(
                             item.solarDate.year,
                             item.solarDate.month,
                             item.solarDate.day,
                           ) ==
                           todayKey,
-                      dateLabel: DateFormat('M월 d일 (E)', 'ko_KR')
-                          .format(item.solarDate),
+                      dateLabel: DateFormat(
+                        'M월 d일 (E)',
+                        'ko_KR',
+                      ).format(item.solarDate),
                       lunarLabel: item.lunar == null
                           ? null
                           : _lunarDay(item.lunar!),
@@ -172,14 +174,18 @@ class _DayCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final base = outside
         ? AppColors.inkMuted.withValues(alpha: 0.45)
-        : (day.weekday == DateTime.sunday ? AppColors.cinnabarSoft : AppColors.ink);
+        : (day.weekday == DateTime.sunday
+              ? AppColors.cinnabarSoft
+              : AppColors.ink);
     return Container(
       margin: const EdgeInsets.all(2),
       padding: const EdgeInsets.fromLTRB(3, 4, 3, 3),
       decoration: BoxDecoration(
         color: today
             ? AppColors.pine.withValues(alpha: 0.14)
-            : (selected ? AppColors.cinnabar.withValues(alpha: 0.08) : AppColors.hanjiCard),
+            : (selected
+                  ? AppColors.cinnabar.withValues(alpha: 0.08)
+                  : AppColors.hanjiCard),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: today
@@ -191,25 +197,24 @@ class _DayCell extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Text(
-                '${day.day}',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: today ? AppColors.pine : base,
-                ),
-              ),
-              const Spacer(),
-              Text(
-                lunarText,
-                style: TextStyle(
-                  fontSize: 8,
-                  color: today ? AppColors.pine : AppColors.inkMuted,
-                ),
-              ),
-            ],
+          Text(
+            '${day.day}',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              height: 1.1,
+              color: today ? AppColors.pine : base,
+            ),
+          ),
+          Text(
+            lunarText,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 8,
+              height: 1.2,
+              color: today ? AppColors.pine : AppColors.inkMuted,
+            ),
           ),
           const SizedBox(height: 2),
           for (final item in events.take(3))
@@ -264,7 +269,9 @@ class _MonthEventTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Material(
-        color: isToday ? AppColors.pine.withValues(alpha: 0.12) : AppColors.hanjiCard,
+        color: isToday
+            ? AppColors.pine.withValues(alpha: 0.12)
+            : AppColors.hanjiCard,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
           side: BorderSide(
@@ -291,7 +298,8 @@ class _MonthEventTile extends StatelessWidget {
           ),
           trailing: EventTypeBadge(
             type: occurrence.event.type,
-            kindLabel: occurrence.event.jesaKind?.label ??
+            kindLabel:
+                occurrence.event.jesaKind?.label ??
                 occurrence.event.gyeongjosaKind?.label,
           ),
         ),

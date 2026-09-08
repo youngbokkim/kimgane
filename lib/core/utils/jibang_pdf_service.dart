@@ -177,7 +177,12 @@ class JibangPdfService {
     pw.Font font,
     List<pw.Font> fallback,
   ) {
-    const padding = pw.EdgeInsets.fromLTRB(18, 20, 18, 16);
+    final padding = pw.EdgeInsets.fromLTRB(
+      18 * PdfPageFormat.mm,
+      16 * PdfPageFormat.mm,
+      18 * PdfPageFormat.mm,
+      16 * PdfPageFormat.mm,
+    );
     final page = context.page.pageFormat;
     final innerWidth = page.width - padding.left - padding.right;
     final innerHeight = page.height - padding.top - padding.bottom;
@@ -222,13 +227,16 @@ class JibangPdfService {
                               child: ch.trim().isEmpty
                                   ? pw.SizedBox()
                                   : pw.Center(
-                                      child: pw.Text(
-                                        ch,
-                                        style: _style(
-                                          font,
-                                          fallback,
-                                          fit.fontSize,
-                                        ).copyWith(lineSpacing: 0, height: 1),
+                                      child: pw.FittedBox(
+                                        fit: pw.BoxFit.contain,
+                                        child: pw.Text(
+                                          ch,
+                                          style: _style(
+                                            font,
+                                            fallback,
+                                            fit.fontSize,
+                                          ).copyWith(lineSpacing: 0, height: 1),
+                                        ),
                                       ),
                                     ),
                             ),
