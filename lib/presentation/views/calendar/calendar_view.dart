@@ -68,7 +68,8 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
             eventLoader: eventsOn,
             calendarFormat: CalendarFormat.month,
             availableGestures: AvailableGestures.horizontalSwipe,
-            rowHeight: 108,
+            sixWeekMonthsEnforced: true,
+            rowHeight: 120,
             daysOfWeekHeight: 28,
             headerStyle: const HeaderStyle(
               formatButtonVisible: false,
@@ -84,7 +85,8 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
               markersMaxCount: 0,
               todayDecoration: BoxDecoration(),
               selectedDecoration: BoxDecoration(),
-              cellMargin: EdgeInsets.all(2),
+              cellMargin: EdgeInsets.zero,
+              tablePadding: EdgeInsets.symmetric(horizontal: 4),
             ),
             calendarBuilders: CalendarBuilders(
               defaultBuilder: (context, day, focused) =>
@@ -177,67 +179,71 @@ class _DayCell extends StatelessWidget {
         : (day.weekday == DateTime.sunday
               ? AppColors.cinnabarSoft
               : AppColors.ink);
-    return Container(
-      margin: const EdgeInsets.all(2),
-      padding: const EdgeInsets.fromLTRB(3, 4, 3, 3),
-      decoration: BoxDecoration(
-        color: today
-            ? AppColors.pine.withValues(alpha: 0.14)
-            : (selected
-                  ? AppColors.cinnabar.withValues(alpha: 0.08)
-                  : AppColors.hanjiCard),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
+    return SizedBox.expand(
+      child: Container(
+        margin: const EdgeInsets.all(1.5),
+        padding: const EdgeInsets.fromLTRB(3, 3, 3, 2),
+        decoration: BoxDecoration(
           color: today
-              ? AppColors.pine
-              : (selected ? AppColors.cinnabar : AppColors.line),
-          width: today || selected ? 1.4 : 1,
+              ? AppColors.pine.withValues(alpha: 0.14)
+              : (selected
+                    ? AppColors.cinnabar.withValues(alpha: 0.08)
+                    : AppColors.hanjiCard),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: today
+                ? AppColors.pine
+                : (selected ? AppColors.cinnabar : AppColors.line),
+            width: today || selected ? 1.4 : 1,
+          ),
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '${day.day}',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              height: 1.1,
-              color: today ? AppColors.pine : base,
-            ),
-          ),
-          Text(
-            lunarText,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 8,
-              height: 1.2,
-              color: today ? AppColors.pine : AppColors.inkMuted,
-            ),
-          ),
-          const SizedBox(height: 2),
-          for (final item in events.take(3))
-            Padding(
-              padding: const EdgeInsets.only(bottom: 1),
-              child: Text(
-                item.event.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 8,
-                  height: 1.15,
-                  fontWeight: FontWeight.w700,
-                  color: _eventColor(item.event.type),
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              '${day.day}',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                height: 1.1,
+                color: today ? AppColors.pine : base,
               ),
             ),
-          if (events.length > 3)
             Text(
-              '+${events.length - 3}',
-              style: const TextStyle(fontSize: 8, color: AppColors.inkMuted),
+              lunarText,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 8,
+                height: 1.2,
+                color: today ? AppColors.pine : AppColors.inkMuted,
+              ),
             ),
-        ],
+            const SizedBox(height: 2),
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  for (final item in events)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 1),
+                      child: Text(
+                        item.event.title,
+                        softWrap: true,
+                        style: TextStyle(
+                          fontSize: 8,
+                          height: 1.25,
+                          fontWeight: FontWeight.w700,
+                          color: _eventColor(item.event.type),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
