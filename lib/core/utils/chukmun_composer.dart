@@ -24,18 +24,107 @@ class ChukmunText {
     return longest;
   }
 
-  /// 각 구절을 세로 한 줄로 두고, 칸이 차면 다음 줄(왼쪽)로 넘긴다.
-  List<List<String>> verticalLines({required int maxCharsPerColumn}) {
-    final limit = maxCharsPerColumn < 1 ? 1 : maxCharsPerColumn;
+  double visualLengthOf(List<String> chars) {
+    var length = 0.0;
+    for (final ch in chars) {
+      length += ch.trim().isEmpty ? ChukmunFit.spaceHeightFactor : 1.0;
+    }
+    return length;
+  }
+
+  /// 각 구절을 세로 한 줄로 둔다. 칸이 모자라면 띄어쓰기에서 다음 줄로 넘기고,
+  /// 단어 중간(없사옵니다, 음식과 등)은 끊지 않는다.
+  List<List<String>> verticalLines({required num maxCharsPerColumn}) {
+    final limit = maxCharsPerColumn < 1 ? 1.0 : maxCharsPerColumn.toDouble();
     final lines = <List<String>>[];
     for (final column in columns) {
       final chars = charsOf(column);
       if (chars.isEmpty) continue;
-      for (var i = 0; i < chars.length; i += limit) {
-        final end = i + limit > chars.length ? chars.length : i + limit;
-        lines.add(chars.sublist(i, end));
+      lines.addAll(_wrapColumn(chars, limit));
+    }
+    return lines;
+  }
+
+  List<List<String>> _wrapColumn(List<String> chars, double limit) {
+    if (visualLengthOf(chars) <= limit + 0.05) {
+      return [List<String>.from(chars)];
+    }
+
+    final tokens = <List<String>>[];
+    var word = <String>[];
+    for (final ch in chars) {
+      if (ch.trim().isEmpty) {
+        if (word.isNotEmpty) {
+          tokens.add(word);
+          word = [];
+        }
+        tokens.add([ch]);
+      } else {
+        word.add(ch);
       }
     }
+    if (word.isNotEmpty) tokens.add(word);
+
+    final lines = <List<String>>[];
+    var line = <String>[];
+    var used = 0.0;
+    for (final token in tokens) {
+      final tokenLen = visualLengthOf(token);
+      final isSpace = token.length == 1 && token.first.trim().isEmpty;
+      if (line.isNotEmpty && used + tokenLen > limit + 0.05) {
+        if (isSpace) continue;
+        // 없사옵니다. / 음식과처럼 짧은 끝이 다음 줄로 떨어지지 않게 한 줄에 붙인다.
+        if (used + tokenLen <= limit + 2.0) {
+          line.addAll(token);
+          used += tokenLen;
+          continue;
+        }
+        if (tokenLen <= limit + 0.001) {
+          lines.add(line);
+          line = List<String>.from(token);
+          used = tokenLen;
+          continue;
+        }
+        lines.add(line);
+        line = [];
+        used = 0;
+        for (final piece in _hardWrap(token, limit)) {
+          if (line.isNotEmpty) lines.add(line);
+          line = piece;
+          used = visualLengthOf(piece);
+        }
+        continue;
+      }
+      if (tokenLen > limit + 0.001 && line.isEmpty) {
+        for (final piece in _hardWrap(token, limit)) {
+          if (line.isNotEmpty) lines.add(line);
+          line = piece;
+          used = visualLengthOf(piece);
+        }
+        continue;
+      }
+      line.addAll(token);
+      used += tokenLen;
+    }
+    if (line.isNotEmpty) lines.add(line);
+    return lines;
+  }
+
+  List<List<String>> _hardWrap(List<String> chars, double limit) {
+    final lines = <List<String>>[];
+    var line = <String>[];
+    var used = 0.0;
+    for (final ch in chars) {
+      final unit = ch.trim().isEmpty ? ChukmunFit.spaceHeightFactor : 1.0;
+      if (line.isNotEmpty && used + unit > limit + 0.001) {
+        lines.add(line);
+        line = [];
+        used = 0;
+      }
+      line.add(ch);
+      used += unit;
+    }
+    if (line.isNotEmpty) lines.add(line);
     return lines;
   }
 }
@@ -47,6 +136,7 @@ class ChukmunFit {
     required this.columnWidth,
     required this.columnGap,
     required this.maxCharsPerColumn,
+    this.maxVisualUnits,
   });
 
   static const spaceHeightFactor = 0.55;
@@ -56,13 +146,16 @@ class ChukmunFit {
   final double columnWidth;
   final double columnGap;
   final int maxCharsPerColumn;
+  final double? maxVisualUnits;
+
+  double get wrapLimit => maxVisualUnits ?? maxCharsPerColumn.toDouble();
 
   double heightOf(String ch) {
     return ch.trim().isEmpty ? charHeight * spaceHeightFactor : charHeight;
   }
 
   /// A4 가로 한 장의 안쪽 영역에 맞게, 들어갈 수 있는 가장 큰 글자 크기를 고른다.
-  /// 글자 간격은 페이지를 채우려고 늘리지 않는다.
+  /// 글자 간격은 페이지를 채우려고 늘리지 않고, 구절은 되도록 한 줄에 둔다.
   factory ChukmunFit.forPage({
     required ChukmunText text,
     required double innerWidth,
@@ -80,6 +173,7 @@ class ChukmunFit {
         columnWidth: 17,
         columnGap: 6,
         maxCharsPerColumn: 1,
+        maxVisualUnits: 1,
       );
     }
 
@@ -87,30 +181,30 @@ class ChukmunFit {
     final widthFactor = brush ? 1.4 : 1.36;
     final gapFactor = brush ? 0.42 : 0.36;
     final cap = brush ? 14.0 : maxFontSize;
+    final packedColumns = [
+      for (final column in text.columns)
+        if (text.charsOf(column).isNotEmpty) text.charsOf(column),
+    ];
 
     ChukmunFit at(double font) {
       final charHeight = font * heightFactor;
+      final maxVisual = innerHeight / charHeight;
       return ChukmunFit(
         fontSize: font,
         charHeight: charHeight,
         columnWidth: font * widthFactor,
         columnGap: font * gapFactor,
-        maxCharsPerColumn: (innerHeight / charHeight).floor().clamp(1, 1000),
+        maxCharsPerColumn: maxVisual.floor().clamp(1, 1000),
+        maxVisualUnits: maxVisual,
       );
     }
 
-    bool fits(ChukmunFit fit) {
-      final packed = text.verticalLines(
-        maxCharsPerColumn: fit.maxCharsPerColumn,
-      );
-      if (packed.isEmpty) return true;
-      final usedWidth = packed.length * (fit.columnWidth + fit.columnGap);
+    bool fitsUnwrapped(ChukmunFit fit) {
+      final usedWidth =
+          packedColumns.length * (fit.columnWidth + fit.columnGap);
       var usedHeight = 0.0;
-      for (final line in packed) {
-        var height = 0.0;
-        for (final ch in line) {
-          height += fit.heightOf(ch);
-        }
+      for (final line in packedColumns) {
+        final height = text.visualLengthOf(line) * fit.charHeight;
         if (height > usedHeight) usedHeight = height;
       }
       return usedWidth <= innerWidth && usedHeight <= innerHeight;
@@ -122,7 +216,7 @@ class ChukmunFit {
     for (var i = 0; i < 24; i++) {
       final mid = (lo + hi) / 2;
       final candidate = at(mid);
-      if (fits(candidate)) {
+      if (fitsUnwrapped(candidate)) {
         best = candidate;
         lo = mid;
       } else {

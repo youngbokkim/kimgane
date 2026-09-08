@@ -104,6 +104,22 @@ void main() {
     ]);
   });
 
+  test('축문 세로줄은 단어 중간에서 끊지 않는다', () {
+    const text = ChukmunText(
+      columns: ['은공을 갚을 길이 없사옵니다.', '이에 후손들이 여러 가지 음식과'],
+      plainText: '',
+    );
+    final wrapped = text.verticalLines(maxCharsPerColumn: 14);
+    final joined = wrapped.map((line) => line.join()).toList();
+    expect(joined.any((line) => line.contains('없사옵니다.')), isTrue);
+    expect(
+      joined.any((line) => line.contains('없사옵니') && !line.contains('없사옵니다.')),
+      isFalse,
+    );
+    expect(joined.any((line) => line.contains('가지 음식과')), isTrue);
+    expect(joined.contains('음식과'), isFalse);
+  });
+
   test('축문 세로줄은 띄어쓰기를 칸으로 남긴다', () {
     const text = ChukmunText(columns: ['효손 영필이'], plainText: '효손 영필이');
     expect(text.charsOf('효손 영필이'), ['효', '손', ' ', '영', '필', '이']);
@@ -127,7 +143,7 @@ void main() {
       innerWidth: innerWidth,
       innerHeight: innerHeight,
     );
-    final lines = text.verticalLines(maxCharsPerColumn: fit.maxCharsPerColumn);
+    final lines = text.verticalLines(maxCharsPerColumn: fit.wrapLimit);
     final usedWidth = lines.length * (fit.columnWidth + fit.columnGap);
     var usedHeight = 0.0;
     for (final line in lines) {
@@ -142,6 +158,10 @@ void main() {
     expect(usedHeight, greaterThan(innerHeight * 0.8));
     expect(usedWidth, greaterThan(innerWidth * 0.7));
     expect(fit.fontSize, greaterThan(20));
+    final joined = lines.map((line) => line.join()).toList();
+    expect(joined.any((line) => line.contains('없사옵니다.')), isTrue);
+    expect(joined.any((line) => line.contains('가지 음식과')), isTrue);
+    expect(lines.length, text.lineCount);
   });
 
   test('생존 가족은 기타 대신 생일을 보여 준다', () {

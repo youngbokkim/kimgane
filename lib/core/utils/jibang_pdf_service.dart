@@ -191,9 +191,7 @@ class JibangPdfService {
       innerWidth: innerWidth,
       innerHeight: innerHeight,
     );
-    final lines = chukmun.verticalLines(
-      maxCharsPerColumn: fit.maxCharsPerColumn,
-    );
+    final lines = chukmun.verticalLines(maxCharsPerColumn: fit.wrapLimit);
 
     return pw.FullPage(
       ignoreMargins: true,

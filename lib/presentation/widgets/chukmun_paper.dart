@@ -40,9 +40,7 @@ class ChukmunPaper extends StatelessWidget {
           innerWidth: innerWidth,
           innerHeight: innerHeight,
         );
-        final lines = chukmun.verticalLines(
-          maxCharsPerColumn: fit.maxCharsPerColumn,
-        );
+        final lines = chukmun.verticalLines(maxCharsPerColumn: fit.wrapLimit);
 
         return Center(
           child: Container(
