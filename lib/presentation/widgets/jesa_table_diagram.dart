@@ -58,7 +58,9 @@ class JesaTableDiagram extends StatelessWidget {
                             : const Color(0xFFF7F0DE),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: i == 0 ? AppColors.cinnabarSoft : AppColors.line,
+                          color: i == 0
+                              ? AppColors.cinnabarSoft
+                              : AppColors.line,
                         ),
                       ),
                       child: Text(
@@ -66,7 +68,9 @@ class JesaTableDiagram extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: i == 0 ? FontWeight.w700 : FontWeight.w500,
+                          fontWeight: i == 0
+                              ? FontWeight.w700
+                              : FontWeight.w500,
                           color: AppColors.ink,
                         ),
                       ),

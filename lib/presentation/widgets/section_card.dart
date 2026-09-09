@@ -55,9 +55,7 @@ class SectionCard extends StatelessWidget {
 
     return Card(
       clipBehavior: Clip.antiAlias,
-      child: onTap == null
-          ? content
-          : InkWell(onTap: onTap, child: content),
+      child: onTap == null ? content : InkWell(onTap: onTap, child: content),
     );
   }
 }

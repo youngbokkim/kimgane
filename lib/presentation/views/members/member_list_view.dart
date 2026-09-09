@@ -47,7 +47,10 @@ class _Group extends StatelessWidget {
         Text(title, style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 8),
         if (members.isEmpty)
-          const Text('등록된 가족이 없습니다.', style: TextStyle(color: AppColors.inkMuted))
+          const Text(
+            '등록된 가족이 없습니다.',
+            style: TextStyle(color: AppColors.inkMuted),
+          )
         else
           for (final member in members)
             Card(

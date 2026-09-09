@@ -4,10 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:kimgane/app.dart';
 import 'package:kimgane/core/utils/chukmun_composer.dart';
+import 'package:kimgane/core/utils/event_notification_planner.dart';
 import 'package:kimgane/core/utils/jibang_composer.dart';
 import 'package:kimgane/core/utils/lunar_service.dart';
+import 'package:kimgane/core/utils/occurrence_service.dart';
 import 'package:kimgane/data/datasources/local_store.dart';
 import 'package:kimgane/data/models/enums.dart';
+import 'package:kimgane/data/models/family_event.dart';
 import 'package:kimgane/data/providers.dart';
 import 'package:kimgane/data/repositories/seed_coordinator.dart';
 import 'package:kimgane/data/seed/seed_data.dart';
@@ -172,6 +175,56 @@ void main() {
     expect(yeongok.birthDateLabel, isNull);
   });
 
+  test('일정 알림은 하루 전 지정 시각과 당일 자정에 잡힌다', () {
+    final occurrences = OccurrenceService(LunarService());
+    final event = FamilyEvent(
+      id: 'evt-nari-birthday',
+      type: EventType.birthday,
+      title: '나리 생일',
+      calendarKind: CalendarKind.solar,
+      month: 9,
+      day: 20,
+      createdAt: DateTime(2026, 1, 1),
+    );
+    final planned = EventNotificationPlanner.plan(
+      events: [event],
+      occurrences: occurrences,
+      hour: 9,
+      minute: 30,
+      now: DateTime(2026, 9, 8, 12),
+    );
+    expect(planned, isNotEmpty);
+    expect(planned.first.when, DateTime(2026, 9, 19, 9, 30));
+    expect(planned.first.title, '내일 생일');
+    expect(planned.first.kind, EventNotificationKind.dayBefore);
+    expect(planned.first.body, contains('나리 생일'));
+    expect(planned[1].when, DateTime(2026, 9, 20));
+    expect(planned[1].title, '오늘 생일');
+    expect(planned[1].kind, EventNotificationKind.sameDay);
+
+    final afterDayBefore = EventNotificationPlanner.plan(
+      events: [event],
+      occurrences: occurrences,
+      hour: 9,
+      minute: 30,
+      now: DateTime(2026, 9, 19, 10),
+    );
+    expect(afterDayBefore.first.when, DateTime(2026, 9, 20));
+    expect(afterDayBefore.first.kind, EventNotificationKind.sameDay);
+    expect(afterDayBefore[1].when, DateTime(2027, 9, 19, 9, 30));
+    expect(afterDayBefore[1].kind, EventNotificationKind.dayBefore);
+
+    final afterMidnight = EventNotificationPlanner.plan(
+      events: [event],
+      occurrences: occurrences,
+      hour: 9,
+      minute: 30,
+      now: DateTime(2026, 9, 20, 0, 1),
+    );
+    expect(afterMidnight.first.when.year, 2027);
+    expect(afterMidnight.first.when, DateTime(2027, 9, 19, 9, 30));
+  });
+
   testWidgets('홈에 김가네와 광산김씨가 보인다', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
@@ -246,5 +299,69 @@ void main() {
     expect(find.textContaining('덕수가'), findsNothing);
     expect(find.textContaining('할아버지'), findsWidgets);
     expect(find.textContaining('흠향'), findsWidgets);
+  });
+
+  testWidgets('안드로이드 너비에서 축문 미리보기가 넘치지 않는다', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2340);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final overflows = <String>[];
+    final originalOnError = FlutterError.onError;
+    FlutterError.onError = (details) {
+      final text = details.exceptionAsString();
+      if (text.contains('overflowed')) {
+        overflows.add(text);
+      }
+      originalOnError?.call(details);
+    };
+    addTearDown(() => FlutterError.onError = originalOnError);
+
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    await SeedCoordinator(LocalStore(prefs)).seedIfNeeded();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        child: KimganeApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('제례'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('지방 · 축문 쓰기'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilterChip, '김명룡 (할아버지)'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilterChip, '박천분 (할머니)'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('미리보기').first);
+    await tester.pumpAndSettle();
+    expect(find.text('지방 · 축문 미리보기'), findsOneWidget);
+    expect(overflows, isEmpty, reason: overflows.join('\n---\n'));
+  });
+
+  testWidgets('설정에서 하루 전 알림 시각을 바꿀 수 있다', (tester) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    await SeedCoordinator(LocalStore(prefs)).seedIfNeeded();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        child: KimganeApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('설정'));
+    await tester.pumpAndSettle();
+    expect(find.text('일정 알림'), findsOneWidget);
+    expect(find.text('하루 전 알림 시각'), findsOneWidget);
+    expect(find.text('당일 알림'), findsOneWidget);
   });
 }

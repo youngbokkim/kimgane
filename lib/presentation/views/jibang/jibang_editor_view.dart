@@ -35,19 +35,26 @@ class _JibangEditorViewState extends ConsumerState<JibangEditorView> {
     final events = ref.watch(eventsViewModelProvider);
     final composer = ref.watch(jibangComposerProvider);
     final deceased = members.where((m) => m.isDeceased).toList();
-    final selected = members.where((m) => state.selectedIds.contains(m.id)).toList();
+    final selected = members
+        .where((m) => state.selectedIds.contains(m.id))
+        .toList();
     final texts = composer.pairFor(selected);
-    final chukmun = ref.watch(chukmunComposerProvider).compose(
-      ancestors: selected,
-      events: events,
-    );
+    final chukmun = ref
+        .watch(chukmunComposerProvider)
+        .compose(ancestors: selected, events: events);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('지방 · 축문 쓰기'),
+        title: const FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text('지방 · 축문 쓰기'),
+        ),
         actions: [
           TextButton(
-            onPressed: texts.isEmpty ? null : () => context.push('/jibang/preview'),
+            onPressed: texts.isEmpty
+                ? null
+                : () => context.push('/jibang/preview'),
             child: const Text('미리보기'),
           ),
         ],
@@ -76,8 +83,9 @@ class _JibangEditorViewState extends ConsumerState<JibangEditorView> {
                 FilterChip(
                   label: Text('${member.name} (${member.kinship.label})'),
                   selected: state.selectedIds.contains(member.id),
-                  onSelected: (_) =>
-                      ref.read(jibangViewModelProvider.notifier).toggle(member.id),
+                  onSelected: (_) => ref
+                      .read(jibangViewModelProvider.notifier)
+                      .toggle(member.id),
                 ),
             ],
           ),

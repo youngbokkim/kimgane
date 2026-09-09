@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kimgane/core/utils/chukmun_composer.dart';
+import 'package:kimgane/core/utils/event_notification_service.dart';
 import 'package:kimgane/core/utils/jibang_composer.dart';
 import 'package:kimgane/core/utils/occurrence_service.dart';
 import 'package:kimgane/data/models/app_settings.dart';
@@ -35,8 +36,16 @@ final chukmunComposerProvider = Provider<ChukmunComposer>((ref) {
   return ChukmunComposer(ref.watch(lunarServiceProvider));
 });
 
+final eventNotificationServiceProvider = Provider<EventNotificationService>((
+  ref,
+) {
+  return EventNotificationService();
+});
+
 final membersViewModelProvider =
-    NotifierProvider<MembersViewModel, List<FamilyMember>>(MembersViewModel.new);
+    NotifierProvider<MembersViewModel, List<FamilyMember>>(
+      MembersViewModel.new,
+    );
 
 class MembersViewModel extends Notifier<List<FamilyMember>> {
   @override
@@ -118,10 +127,7 @@ class SettingsViewModel extends Notifier<AppSettings> {
 }
 
 class JibangState {
-  const JibangState({
-    this.selectedIds = const [],
-    this.useHanja = true,
-  });
+  const JibangState({this.selectedIds = const [], this.useHanja = true});
 
   final List<String> selectedIds;
   final bool useHanja;
@@ -134,8 +140,9 @@ class JibangState {
   }
 }
 
-final jibangViewModelProvider =
-    NotifierProvider<JibangViewModel, JibangState>(JibangViewModel.new);
+final jibangViewModelProvider = NotifierProvider<JibangViewModel, JibangState>(
+  JibangViewModel.new,
+);
 
 class JibangViewModel extends Notifier<JibangState> {
   @override
@@ -167,9 +174,10 @@ class JibangViewModel extends Notifier<JibangState> {
   }
 }
 
-final calendarMonthProvider = NotifierProvider<CalendarMonthViewModel, DateTime>(
-  CalendarMonthViewModel.new,
-);
+final calendarMonthProvider =
+    NotifierProvider<CalendarMonthViewModel, DateTime>(
+      CalendarMonthViewModel.new,
+    );
 
 class CalendarMonthViewModel extends Notifier<DateTime> {
   @override

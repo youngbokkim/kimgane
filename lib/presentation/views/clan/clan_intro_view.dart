@@ -14,10 +14,7 @@ class ClanIntroView extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          Text(
-            '光山金氏 · 경상북도 의성',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
+          Text('光山金氏 · 경상북도 의성', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           const Text(ClanIntroContent.intro),
           const SizedBox(height: 16),
@@ -97,9 +94,7 @@ class _ClanPhotoCard extends StatelessWidget {
                 for (final word in section.glossary)
                   Tooltip(
                     message: word.meaning,
-                    child: Chip(
-                      label: Text('${word.hanja}  ${word.hangul}'),
-                    ),
+                    child: Chip(label: Text('${word.hanja}  ${word.hangul}')),
                   ),
               ],
             ),

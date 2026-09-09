@@ -15,7 +15,9 @@ class EventListView extends ConsumerWidget {
       ..sort((a, b) {
         final byType = a.type.index.compareTo(b.type.index);
         if (byType != 0) return byType;
-        return a.month == b.month ? a.day.compareTo(b.day) : a.month.compareTo(b.month);
+        return a.month == b.month
+            ? a.day.compareTo(b.day)
+            : a.month.compareTo(b.month);
       });
 
     return Scaffold(

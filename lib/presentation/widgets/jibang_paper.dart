@@ -49,7 +49,9 @@ class JibangPaper extends StatelessWidget {
                       Text(
                         ch,
                         style: TextStyle(
-                          fontFamily: useHanja ? 'NotoSerifKR' : 'NanumMyeongjo',
+                          fontFamily: useHanja
+                              ? 'NotoSerifKR'
+                              : 'NanumMyeongjo',
                           fontFamilyFallback: useHanja
                               ? const ['NanumMyeongjo']
                               : const ['NotoSerifKR'],

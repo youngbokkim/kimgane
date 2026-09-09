@@ -72,7 +72,9 @@ class _MemberFormViewState extends ConsumerState<MemberFormView> {
   @override
   Widget build(BuildContext context) {
     if (widget.memberId != null && !_loaded) {
-      final existing = ref.read(membersViewModelProvider.notifier).byId(widget.memberId!);
+      final existing = ref
+          .read(membersViewModelProvider.notifier)
+          .byId(widget.memberId!);
       if (existing != null) _hydrate(existing);
       _loaded = true;
     }
@@ -80,9 +82,7 @@ class _MemberFormViewState extends ConsumerState<MemberFormView> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.memberId == null ? '가족 추가' : '가족 수정'),
-        actions: [
-          TextButton(onPressed: _save, child: const Text('저장')),
-        ],
+        actions: [TextButton(onPressed: _save, child: const Text('저장'))],
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
@@ -194,9 +194,7 @@ class _MemberFormViewState extends ConsumerState<MemberFormView> {
           ],
           TextField(
             controller: _office,
-            decoration: const InputDecoration(
-              labelText: '관직·봉작 (비우면 학생/유인)',
-            ),
+            decoration: const InputDecoration(labelText: '관직·봉작 (비우면 학생/유인)'),
           ),
           const SizedBox(height: 12),
           TextField(
@@ -232,7 +230,10 @@ class _MemberFormViewState extends ConsumerState<MemberFormView> {
                   context.pop();
                 }
               },
-              child: const Text('삭제', style: TextStyle(color: AppColors.cinnabar)),
+              child: const Text(
+                '삭제',
+                style: TextStyle(color: AppColors.cinnabar),
+              ),
             ),
           ],
         ],
@@ -274,9 +275,9 @@ class _MemberFormViewState extends ConsumerState<MemberFormView> {
 
   Future<void> _save() async {
     if (_name.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('이름을 입력해 주세요.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('이름을 입력해 주세요.')));
       return;
     }
     final existing = widget.memberId == null

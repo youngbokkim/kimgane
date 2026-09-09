@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kimgane/core/constants/clan.dart';
+import 'package:kimgane/core/utils/event_notification_planner.dart';
 import 'package:kimgane/presentation/viewmodels/app_view_models.dart';
 
 class SettingsView extends ConsumerWidget {
@@ -10,6 +12,10 @@ class SettingsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsViewModelProvider);
+    final time = TimeOfDay(
+      hour: settings.notifyHour,
+      minute: settings.notifyMinute,
+    );
 
     return Scaffold(
       appBar: AppBar(title: const Text('설정')),
@@ -47,6 +53,51 @@ class SettingsView extends ConsumerWidget {
             onChanged: (value) => ref
                 .read(settingsViewModelProvider.notifier)
                 .update(settings.copyWith(hometown: value)),
+          ),
+          const SizedBox(height: 16),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('일정 알림'),
+            subtitle: Text(
+              kIsWeb
+                  ? '휴대폰 앱에서 제사·생일·경조사를 하루 전과 당일 자정에 알려 줍니다.'
+                  : '제사·생일·경조사를 ${EventNotificationPlanner.daysBefore}일 전과 당일 자정(00:00)에 알려 줍니다.',
+            ),
+            value: settings.notifyEnabled,
+            onChanged: (value) => ref
+                .read(settingsViewModelProvider.notifier)
+                .update(settings.copyWith(notifyEnabled: value)),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            enabled: settings.notifyEnabled,
+            title: const Text('하루 전 알림 시각'),
+            subtitle: Text(time.format(context)),
+            trailing: const Icon(Icons.schedule_outlined),
+            onTap: settings.notifyEnabled
+                ? () async {
+                    final picked = await showTimePicker(
+                      context: context,
+                      initialTime: time,
+                      helpText: '하루 전 알림 시각',
+                    );
+                    if (picked == null) return;
+                    await ref
+                        .read(settingsViewModelProvider.notifier)
+                        .update(
+                          settings.copyWith(
+                            notifyHour: picked.hour,
+                            notifyMinute: picked.minute,
+                          ),
+                        );
+                  }
+                : null,
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            enabled: settings.notifyEnabled,
+            title: const Text('당일 알림'),
+            subtitle: const Text('자정(00:00)에 알려 줍니다. 시각은 바꿀 수 없습니다.'),
           ),
           const SizedBox(height: 24),
           ListTile(

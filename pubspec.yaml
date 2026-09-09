@@ -22,11 +22,30 @@ dependencies:
   pdf: ^3.11.3
   table_calendar: ^3.2.0
   collection: ^1.19.1
+  flutter_local_notifications: ^22.3.0
+  timezone: ^0.11.1
+  flutter_timezone: ^5.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  macos:
+    generate: true
+  web:
+    generate: true
+  image_path: assets/images/app_icon.png
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: assets/images/app_icon.png
+  adaptive_icon_foreground_inset: 12
+  background_color_ios: "#FFFFFF"
+  remove_alpha_ios: true
+  remove_alpha_macos: true
 
 flutter:
   uses-material-design: true
@@ -38,6 +57,9 @@ flutter:
     - assets/images/family_stone_37_front.jpeg
     - assets/images/family_stone_37_back.jpeg
     - assets/images/jesa_sangcharim.jpeg
+    - assets/images/app_icon_a.png
+    - assets/images/app_icon_b.png
+    - assets/images/app_icon_c.png
   fonts:
     - family: NanumMyeongjo
       fonts:

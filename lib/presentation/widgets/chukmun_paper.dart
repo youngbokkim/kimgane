@@ -59,7 +59,8 @@ class ChukmunPaper extends StatelessWidget {
             ),
             padding: _padding,
             clipBehavior: Clip.hardEdge,
-            child: Align(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
               alignment: Alignment.topRight,
               child: Row(
                 textDirection: TextDirection.rtl,

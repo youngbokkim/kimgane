@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kimgane/core/theme/app_theme.dart';
 import 'package:kimgane/data/models/enums.dart';
+import 'package:kimgane/presentation/viewmodels/app_view_models.dart';
 import 'package:kimgane/presentation/views/calendar/calendar_view.dart';
 import 'package:kimgane/presentation/views/clan/clan_intro_view.dart';
 import 'package:kimgane/presentation/views/events/event_detail_view.dart';
@@ -31,7 +33,9 @@ GoRouter createRouter() {
         },
         branches: [
           StatefulShellBranch(
-            routes: [GoRoute(path: '/', builder: (context, state) => const HomeView())],
+            routes: [
+              GoRoute(path: '/', builder: (context, state) => const HomeView()),
+            ],
           ),
           StatefulShellBranch(
             routes: [
@@ -51,7 +55,10 @@ GoRouter createRouter() {
           ),
           StatefulShellBranch(
             routes: [
-              GoRoute(path: '/rite', builder: (context, state) => const RiteHubView()),
+              GoRoute(
+                path: '/rite',
+                builder: (context, state) => const RiteHubView(),
+              ),
             ],
           ),
           StatefulShellBranch(
@@ -67,14 +74,14 @@ GoRouter createRouter() {
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
         path: '/events/new',
-        builder: (context, state) => EventFormView(
-          initialType: state.extra as EventType?,
-        ),
+        builder: (context, state) =>
+            EventFormView(initialType: state.extra as EventType?),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
         path: '/events/:id',
-        builder: (context, state) => EventDetailView(id: state.pathParameters['id']!),
+        builder: (context, state) =>
+            EventDetailView(id: state.pathParameters['id']!),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
@@ -139,7 +146,8 @@ GoRouter createRouter() {
 }
 
 class KimganeApp extends StatelessWidget {
-  KimganeApp({super.key, GoRouter? router}) : _router = router ?? createRouter();
+  KimganeApp({super.key, GoRouter? router})
+    : _router = router ?? createRouter();
 
   final GoRouter _router;
 
@@ -157,6 +165,43 @@ class KimganeApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       routerConfig: _router,
+      builder: (context, child) {
+        return _NotificationSync(child: child ?? const SizedBox.shrink());
+      },
     );
+  }
+}
+
+class _NotificationSync extends ConsumerStatefulWidget {
+  const _NotificationSync({required this.child});
+
+  final Widget child;
+
+  @override
+  ConsumerState<_NotificationSync> createState() => _NotificationSyncState();
+}
+
+class _NotificationSyncState extends ConsumerState<_NotificationSync> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _sync());
+  }
+
+  Future<void> _sync() async {
+    await ref
+        .read(eventNotificationServiceProvider)
+        .sync(
+          events: ref.read(eventsViewModelProvider),
+          settings: ref.read(settingsViewModelProvider),
+          occurrences: ref.read(occurrenceServiceProvider),
+        );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.listen(eventsViewModelProvider, (_, _) => _sync());
+    ref.listen(settingsViewModelProvider, (_, _) => _sync());
+    return widget.child;
   }
 }

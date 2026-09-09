@@ -20,7 +20,9 @@ class HomeView extends ConsumerWidget {
     final lunar = ref.watch(lunarServiceProvider);
     final today = DateTime.now();
     final todayLunar = lunar.solarToLunar(today);
-    final nextJesa = upcoming.where((e) => e.event.type == EventType.jesa).firstOrNull;
+    final nextJesa = upcoming
+        .where((e) => e.event.type == EventType.jesa)
+        .firstOrNull;
     final dateFmt = DateFormat('M월 d일 (E)', 'ko_KR');
 
     return Scaffold(
@@ -52,7 +54,10 @@ class HomeView extends ConsumerWidget {
               children: [
                 Text(
                   '${settings.defaultBonGwan}${settings.defaultSurname}씨 · ${settings.hometown}',
-                  style: const TextStyle(color: Color(0xFFE7DDC8), fontSize: 13),
+                  style: const TextStyle(
+                    color: Color(0xFFE7DDC8),
+                    fontSize: 13,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -67,7 +72,10 @@ class HomeView extends ConsumerWidget {
                 const SizedBox(height: 4),
                 Text(
                   lunar.formatLunar(todayLunar),
-                  style: const TextStyle(color: Color(0xFFE7DDC8), fontSize: 15),
+                  style: const TextStyle(
+                    color: Color(0xFFE7DDC8),
+                    fontSize: 15,
+                  ),
                 ),
                 if (nextJesa != null) ...[
                   const SizedBox(height: 16),
@@ -121,9 +129,7 @@ class HomeView extends ConsumerWidget {
             subtitle: '의성 가족묘 · 선조 벼슬',
             onTap: () => context.push('/clan'),
             trailing: const Icon(Icons.chevron_right),
-            child: const Text(
-              '직계선조 묘비와 36대·37대 비석을 한글로 풀어 두었습니다.',
-            ),
+            child: const Text('직계선조 묘비와 36대·37대 비석을 한글로 풀어 두었습니다.'),
           ),
           const SizedBox(height: 12),
           SectionCard(

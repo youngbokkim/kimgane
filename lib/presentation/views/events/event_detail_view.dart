@@ -28,6 +28,11 @@ class EventDetailView extends ConsumerWidget {
     final thisYear = DateTime.now().year;
     final occ = occService.occurrenceForYear(event, thisYear);
     final dateFmt = DateFormat('yyyy년 M월 d일 (E)', 'ko_KR');
+    final settings = ref.watch(settingsViewModelProvider);
+    final notifyTime = TimeOfDay(
+      hour: settings.notifyHour,
+      minute: settings.notifyMinute,
+    );
     FamilyMember? member;
     if (event.memberId != null) {
       member = members.where((m) => m.id == event.memberId).firstOrNull;
@@ -92,6 +97,17 @@ class EventDetailView extends ConsumerWidget {
               ],
             ),
           ),
+          if (settings.notifyEnabled)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: SectionCard(
+                title: '알림',
+                child: Text(
+                  '일정 하루 전 ${notifyTime.format(context)}과 당일 자정(00:00)에 '
+                  '휴대폰에서 알려 줍니다. 하루 전 시각은 설정에서 바꿀 수 있습니다.',
+                ),
+              ),
+            ),
           if (member != null) ...[
             const SizedBox(height: 12),
             SectionCard(
@@ -119,7 +135,9 @@ class EventDetailView extends ConsumerWidget {
                           if (ancestors.isNotEmpty) {
                             ref
                                 .read(jibangViewModelProvider.notifier)
-                                .setSelected(ancestors.map((a) => a.id).toList());
+                                .setSelected(
+                                  ancestors.map((a) => a.id).toList(),
+                                );
                           }
                           context.push('/jibang');
                         },
@@ -161,11 +179,16 @@ class EventDetailView extends ConsumerWidget {
                 ),
               );
               if (ok == true && context.mounted) {
-                await ref.read(eventsViewModelProvider.notifier).remove(event.id);
+                await ref
+                    .read(eventsViewModelProvider.notifier)
+                    .remove(event.id);
                 if (context.mounted) context.pop();
               }
             },
-            child: const Text('일정 삭제', style: TextStyle(color: AppColors.cinnabar)),
+            child: const Text(
+              '일정 삭제',
+              style: TextStyle(color: AppColors.cinnabar),
+            ),
           ),
         ],
       ),

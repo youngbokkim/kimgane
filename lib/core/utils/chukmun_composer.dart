@@ -207,7 +207,7 @@ class ChukmunFit {
         final height = text.visualLengthOf(line) * fit.charHeight;
         if (height > usedHeight) usedHeight = height;
       }
-      return usedWidth <= innerWidth && usedHeight <= innerHeight;
+      return usedWidth <= innerWidth - 0.5 && usedHeight <= innerHeight - 0.5;
     }
 
     var lo = minFontSize;

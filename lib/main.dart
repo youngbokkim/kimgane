@@ -14,9 +14,7 @@ Future<void> main() async {
   await SeedCoordinator(LocalStore(prefs)).seedIfNeeded();
   runApp(
     ProviderScope(
-      overrides: [
-        sharedPreferencesProvider.overrideWithValue(prefs),
-      ],
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
       child: KimganeApp(),
     ),
   );

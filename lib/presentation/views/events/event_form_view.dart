@@ -75,7 +75,9 @@ class _EventFormViewState extends ConsumerState<EventFormView> {
   Widget build(BuildContext context) {
     final members = ref.watch(membersViewModelProvider);
     if (widget.eventId != null && !_loaded) {
-      final existing = ref.read(eventsViewModelProvider.notifier).byId(widget.eventId!);
+      final existing = ref
+          .read(eventsViewModelProvider.notifier)
+          .byId(widget.eventId!);
       if (existing != null) {
         _hydrate(existing);
       } else {
@@ -86,9 +88,7 @@ class _EventFormViewState extends ConsumerState<EventFormView> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.eventId == null ? '일정 추가' : '일정 수정'),
-        actions: [
-          TextButton(onPressed: _save, child: const Text('저장')),
-        ],
+        actions: [TextButton(onPressed: _save, child: const Text('저장'))],
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
@@ -120,7 +120,8 @@ class _EventFormViewState extends ConsumerState<EventFormView> {
                 for (final kind in JesaKind.values)
                   DropdownMenuItem(value: kind, child: Text(kind.label)),
               ],
-              onChanged: (value) => setState(() => _jesaKind = value ?? _jesaKind),
+              onChanged: (value) =>
+                  setState(() => _jesaKind = value ?? _jesaKind),
             ),
           if (_type == EventType.gyeongjosa)
             DropdownButtonFormField<GyeongjosaKind>(
@@ -139,7 +140,8 @@ class _EventFormViewState extends ConsumerState<EventFormView> {
               ButtonSegment(value: CalendarKind.lunar, label: Text('음력')),
             ],
             selected: {_calendar},
-            onSelectionChanged: (value) => setState(() => _calendar = value.first),
+            onSelectionChanged: (value) =>
+                setState(() => _calendar = value.first),
           ),
           const SizedBox(height: 8),
           Text(
@@ -163,11 +165,23 @@ class _EventFormViewState extends ConsumerState<EventFormView> {
                 ),
               if (!_recurring) const SizedBox(width: 8),
               Expanded(
-                child: _numberField('월', _month, 1, 12, (v) => setState(() => _month = v)),
+                child: _numberField(
+                  '월',
+                  _month,
+                  1,
+                  12,
+                  (v) => setState(() => _month = v),
+                ),
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: _numberField('일', _day, 1, 31, (v) => setState(() => _day = v)),
+                child: _numberField(
+                  '일',
+                  _day,
+                  1,
+                  31,
+                  (v) => setState(() => _day = v),
+                ),
               ),
             ],
           ),
@@ -181,7 +195,9 @@ class _EventFormViewState extends ConsumerState<EventFormView> {
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
             title: const Text('매년 반복'),
-            subtitle: Text(_type == EventType.gyeongjosa ? '경조사는 보통 한 번입니다' : '생일·제사는 매년 반복'),
+            subtitle: Text(
+              _type == EventType.gyeongjosa ? '경조사는 보통 한 번입니다' : '생일·제사는 매년 반복',
+            ),
             value: _recurring,
             onChanged: (v) => setState(() {
               _recurring = v;
@@ -261,9 +277,9 @@ class _EventFormViewState extends ConsumerState<EventFormView> {
   Future<void> _save() async {
     final title = _title.text.trim();
     if (title.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('제목을 입력해 주세요.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('제목을 입력해 주세요.')));
       return;
     }
     final notifier = ref.read(eventsViewModelProvider.notifier);

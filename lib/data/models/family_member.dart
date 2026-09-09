@@ -52,7 +52,9 @@ class FamilyMember {
 
   String? get birthDateLabel {
     if (birthMonth == null || birthDay == null) return null;
-    final leap = birthCalendar == CalendarKind.lunar && birthLeapMonth ? '윤' : '';
+    final leap = birthCalendar == CalendarKind.lunar && birthLeapMonth
+        ? '윤'
+        : '';
     return '${birthCalendar.label} $leap$birthMonth월 $birthDay일';
   }
 

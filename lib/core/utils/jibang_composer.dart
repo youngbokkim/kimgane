@@ -40,7 +40,8 @@ class JibangComposer {
     final hangulTitle = title == '學生' ? '학생' : title;
     final prefix = member.kinship.usesGoPrefix ? '故' : '顯';
     final hangulPrefix = member.kinship.usesGoPrefix ? '고' : '현';
-    final hanja = '$prefix$relation$title${relation.isEmpty ? member.name : '府君'}神位';
+    final hanja =
+        '$prefix$relation$title${relation.isEmpty ? member.name : '府君'}神位';
     final hangul =
         '$hangulPrefix$hangulRelation$hangulTitle${hangulRelation.isEmpty ? member.name : '부군'}신위';
     return JibangPersonText(

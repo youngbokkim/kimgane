@@ -20,7 +20,9 @@ class OfferingGuideView extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.cinnabar.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.cinnabar.withValues(alpha: 0.2)),
+              border: Border.all(
+                color: AppColors.cinnabar.withValues(alpha: 0.2),
+              ),
             ),
             child: const Text(OfferingGuideContent.clanNote),
           ),
@@ -70,7 +72,10 @@ class OfferingGuideView extends StatelessWidget {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('·  ', style: TextStyle(color: AppColors.cinnabar)),
+                          const Text(
+                            '·  ',
+                            style: TextStyle(color: AppColors.cinnabar),
+                          ),
                           Expanded(child: Text(bullet)),
                         ],
                       ),
@@ -107,7 +112,10 @@ class OfferingGuideView extends StatelessWidget {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('·  ', style: TextStyle(color: AppColors.cinnabar)),
+                            const Text(
+                              '·  ',
+                              style: TextStyle(color: AppColors.cinnabar),
+                            ),
                             Expanded(child: Text(bullet)),
                           ],
                         ),

@@ -28,14 +28,14 @@ class JibangPreviewView extends ConsumerWidget {
 
     if (texts.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('지방 · 축문 미리보기')),
+        appBar: AppBar(title: const _PreviewTitle()),
         body: const Center(child: Text('선택된 조상이 없습니다.')),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('지방 · 축문 미리보기'),
+        title: const _PreviewTitle(),
         actions: [
           IconButton(
             tooltip: 'PDF 저장',
@@ -309,5 +309,18 @@ Future<void> _export(
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text('지방·축문 PDF를 만들지 못했습니다. $error')));
+  }
+}
+
+class _PreviewTitle extends StatelessWidget {
+  const _PreviewTitle();
+
+  @override
+  Widget build(BuildContext context) {
+    return const FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: Alignment.centerLeft,
+      child: Text('지방 · 축문 미리보기'),
+    );
   }
 }

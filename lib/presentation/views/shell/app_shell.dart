@@ -24,7 +24,11 @@ class AppShell extends StatelessWidget {
         selected: Icons.calendar_month,
         label: '달력',
       ),
-      _Dest(icon: Icons.event_note_outlined, selected: Icons.event_note, label: '일정'),
+      _Dest(
+        icon: Icons.event_note_outlined,
+        selected: Icons.event_note,
+        label: '일정',
+      ),
       _Dest(
         icon: Icons.auto_stories_outlined,
         selected: Icons.auto_stories,
@@ -53,10 +57,7 @@ class AppShell extends StatelessWidget {
                         color: AppColors.cinnabar,
                       ),
                     ),
-                    Text(
-                      '김가네',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
+                    Text('김가네', style: Theme.of(context).textTheme.titleLarge),
                   ],
                 ),
               ),

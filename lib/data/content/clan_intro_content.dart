@@ -82,11 +82,7 @@ class ClanIntroContent {
           hangul: '용양위',
           meaning: '조선 중앙군 오위(의흥·용양·호분·충좌·충무) 가운데 하나입니다.',
         ),
-        HanjaLine(
-          hanja: '副護軍',
-          hangul: '부호군',
-          meaning: '오위에 속한 군직. 종4품입니다.',
-        ),
+        HanjaLine(hanja: '副護軍', hangul: '부호군', meaning: '오위에 속한 군직. 종4품입니다.'),
         HanjaLine(
           hanja: '貞夫人',
           hangul: '정부인',
@@ -125,7 +121,11 @@ class ClanIntroContent {
         ),
       ],
       glossary: [
-        HanjaLine(hanja: '世', hangul: '세', meaning: '대(代). 시조로부터 몇 번째인지를 적습니다.'),
+        HanjaLine(
+          hanja: '世',
+          hangul: '세',
+          meaning: '대(代). 시조로부터 몇 번째인지를 적습니다.',
+        ),
         HanjaLine(hanja: '之墓', hangul: '지묘', meaning: '~의 무덤.'),
         HanjaLine(hanja: '配', hangul: '배', meaning: '배위. 배우자.'),
         HanjaLine(hanja: '祔', hangul: '부', meaning: '합장. 같은 자리에 모심.'),

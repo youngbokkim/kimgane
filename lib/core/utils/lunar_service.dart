@@ -84,11 +84,7 @@ class LunarService {
       );
     } catch (_) {
       if (isLeapMonth) {
-        return _lunarToSolarUtc(
-          year: year,
-          month: month,
-          day: day,
-        );
+        return _lunarToSolarUtc(year: year, month: month, day: day);
       }
       rethrow;
     }
