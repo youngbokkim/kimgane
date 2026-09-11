@@ -1,3 +1,30 @@
+class AppTextScale {
+  static const normal = 1.0;
+  static const large = 1.25;
+  static const extraLarge = 1.5;
+
+  static const options = <({double value, String label, String hint})>[
+    (value: normal, label: '보통', hint: '기본 크기'),
+    (value: large, label: '크게', hint: '읽기 쉽게'),
+    (value: extraLarge, label: '더 크게', hint: '더 크게'),
+  ];
+
+  static double normalize(dynamic raw) {
+    if (raw == null) return large;
+    final value = (raw as num).toDouble();
+    var best = large;
+    var distance = (value - large).abs();
+    for (final option in options) {
+      final next = (value - option.value).abs();
+      if (next < distance) {
+        best = option.value;
+        distance = next;
+      }
+    }
+    return best;
+  }
+}
+
 class AppSettings {
   const AppSettings({
     required this.officiantId,
@@ -7,6 +34,7 @@ class AppSettings {
     this.notifyEnabled = true,
     this.notifyHour = 9,
     this.notifyMinute = 0,
+    this.textScale = AppTextScale.large,
   });
 
   final String officiantId;
@@ -16,6 +44,7 @@ class AppSettings {
   final bool notifyEnabled;
   final int notifyHour;
   final int notifyMinute;
+  final double textScale;
 
   AppSettings copyWith({
     String? officiantId,
@@ -25,6 +54,7 @@ class AppSettings {
     bool? notifyEnabled,
     int? notifyHour,
     int? notifyMinute,
+    double? textScale,
   }) {
     return AppSettings(
       officiantId: officiantId ?? this.officiantId,
@@ -34,6 +64,7 @@ class AppSettings {
       notifyEnabled: notifyEnabled ?? this.notifyEnabled,
       notifyHour: notifyHour ?? this.notifyHour,
       notifyMinute: notifyMinute ?? this.notifyMinute,
+      textScale: textScale ?? this.textScale,
     );
   }
 
@@ -45,6 +76,7 @@ class AppSettings {
     'notifyEnabled': notifyEnabled,
     'notifyHour': notifyHour,
     'notifyMinute': notifyMinute,
+    'textScale': textScale,
   };
 
   factory AppSettings.fromJson(Map<String, dynamic> json) {
@@ -56,6 +88,7 @@ class AppSettings {
       notifyEnabled: json['notifyEnabled'] as bool? ?? true,
       notifyHour: json['notifyHour'] as int? ?? 9,
       notifyMinute: json['notifyMinute'] as int? ?? 0,
+      textScale: AppTextScale.normalize(json['textScale']),
     );
   }
 }

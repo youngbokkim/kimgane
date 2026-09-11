@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kimgane/core/constants/clan.dart';
 import 'package:kimgane/core/utils/event_notification_planner.dart';
+import 'package:kimgane/data/models/app_settings.dart';
 import 'package:kimgane/presentation/viewmodels/app_view_models.dart';
 
 class SettingsView extends ConsumerWidget {
@@ -53,6 +54,30 @@ class SettingsView extends ConsumerWidget {
             onChanged: (value) => ref
                 .read(settingsViewModelProvider.notifier)
                 .update(settings.copyWith(hometown: value)),
+          ),
+          const SizedBox(height: 16),
+          Text('글자 크기', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 4),
+          const Text('휴대폰에서 글자가 작으면 크게 바꿔 보세요.'),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final option in AppTextScale.options)
+                ChoiceChip(
+                  label: Text(option.label),
+                  selected: settings.textScale == option.value,
+                  onSelected: (_) => ref
+                      .read(settingsViewModelProvider.notifier)
+                      .update(settings.copyWith(textScale: option.value)),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '가나다 미리보기 · 제사 · 생일',
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 16),
           SwitchListTile(

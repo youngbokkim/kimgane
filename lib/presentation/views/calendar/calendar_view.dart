@@ -53,6 +53,8 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
       );
     }
 
+    final textScale = MediaQuery.textScalerOf(context).scale(14) / 14;
+
     return Scaffold(
       appBar: AppBar(title: const Text('달력')),
       body: ListView(
@@ -69,8 +71,8 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
             calendarFormat: CalendarFormat.month,
             availableGestures: AvailableGestures.horizontalSwipe,
             sixWeekMonthsEnforced: true,
-            rowHeight: 120,
-            daysOfWeekHeight: 28,
+            rowHeight: 120 * textScale,
+            daysOfWeekHeight: 28 * textScale,
             headerStyle: const HeaderStyle(
               formatButtonVisible: false,
               titleCentered: true,

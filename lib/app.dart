@@ -202,6 +202,14 @@ class _NotificationSyncState extends ConsumerState<_NotificationSync> {
   Widget build(BuildContext context) {
     ref.listen(eventsViewModelProvider, (_, _) => _sync());
     ref.listen(settingsViewModelProvider, (_, _) => _sync());
-    return widget.child;
+    final textScale = ref.watch(
+      settingsViewModelProvider.select((s) => s.textScale),
+    );
+    return MediaQuery(
+      data: MediaQuery.of(
+        context,
+      ).copyWith(textScaler: TextScaler.linear(textScale)),
+      child: widget.child,
+    );
   }
 }

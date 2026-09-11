@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:kimgane/core/utils/chukmun_composer.dart';
 import 'package:kimgane/core/utils/jibang_composer.dart';
+import 'package:kimgane/core/utils/jibang_layout.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -124,42 +125,60 @@ class JibangPdfService {
     pw.Font bold,
     List<pw.Font> fallback,
   ) {
-    const width = 60.0 * PdfPageFormat.mm;
     const height = 220.0 * PdfPageFormat.mm;
-    return pw.Container(
-      width: people.length == 1 ? width : width * 1.45,
+    final metrics = JibangLayout.measure(
       height: height,
+      people: people,
+      useHanja: useHanja,
+      borderWidth: 0.8,
+    );
+    return pw.Container(
+      width: metrics.width,
+      height: metrics.height,
       decoration: pw.BoxDecoration(
         border: pw.Border.all(width: 0.8),
-        borderRadius: const pw.BorderRadius.only(
-          topLeft: pw.Radius.circular(90),
-          topRight: pw.Radius.circular(90),
+        borderRadius: pw.BorderRadius.only(
+          topLeft: pw.Radius.circular(metrics.domeRadius),
+          topRight: pw.Radius.circular(metrics.domeRadius),
         ),
       ),
-      padding: const pw.EdgeInsets.fromLTRB(16, 36, 16, 20),
+      padding: pw.EdgeInsets.fromLTRB(
+        metrics.left,
+        metrics.top,
+        metrics.right,
+        metrics.bottom,
+      ),
       child: pw.Row(
-        mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
-        children: people
-            .map(
-              (person) => pw.Expanded(
-                child: pw.Column(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
-                  children: (useHanja ? person.hanjaChars : person.hangulChars)
-                      .map(
-                        (ch) => pw.Text(
-                          ch,
-                          style: _style(
-                            bold,
-                            fallback,
-                            people.length == 1 ? 22 : 18,
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          for (final person in people)
+            pw.Expanded(
+              child: pw.Column(
+                mainAxisAlignment: pw.MainAxisAlignment.start,
+                children: [
+                  for (final ch
+                      in (useHanja ? person.hanjaChars : person.hangulChars))
+                    pw.SizedBox(
+                      height: metrics.slotHeight,
+                      width: metrics.columnWidth,
+                      child: pw.Center(
+                        child: pw.FittedBox(
+                          fit: pw.BoxFit.contain,
+                          child: pw.Text(
+                            ch,
+                            style: _style(
+                              bold,
+                              fallback,
+                              metrics.fontSize,
+                            ).copyWith(lineSpacing: 0, height: 1),
                           ),
                         ),
-                      )
-                      .toList(),
-                ),
+                      ),
+                    ),
+                ],
               ),
-            )
-            .toList(),
+            ),
+        ],
       ),
     );
   }

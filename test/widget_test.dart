@@ -6,6 +6,7 @@ import 'package:kimgane/app.dart';
 import 'package:kimgane/core/utils/chukmun_composer.dart';
 import 'package:kimgane/core/utils/event_notification_planner.dart';
 import 'package:kimgane/core/utils/jibang_composer.dart';
+import 'package:kimgane/core/utils/jibang_layout.dart';
 import 'package:kimgane/core/utils/lunar_service.dart';
 import 'package:kimgane/core/utils/occurrence_service.dart';
 import 'package:kimgane/data/datasources/local_store.dart';
@@ -67,6 +68,21 @@ void main() {
     );
     expect(jibang.compose(grandfather).hanja, '顯祖考學生府君神位');
     expect(jibang.compose(grandmother).hanja, '顯祖妣孺人尙山朴氏神位');
+
+    final pair = jibang.pairFor([grandfather, grandmother]);
+    final metrics = JibangLayout.measure(
+      height: 220,
+      people: pair,
+      useHanja: true,
+    );
+    expect(metrics.width / metrics.height, closeTo(6 / 22, 0.0001));
+    expect(metrics.columns, 2);
+    expect(metrics.maxChars, 11);
+    expect(metrics.fontSize, lessThanOrEqualTo(metrics.columnWidth));
+    expect(
+      metrics.slotHeight * metrics.maxChars,
+      closeTo(metrics.innerHeight, 0.001),
+    );
   });
 
   test('할아버지·할머니 축문을 한글 세로 문구로 만든다', () {
@@ -363,5 +379,14 @@ void main() {
     expect(find.text('일정 알림'), findsOneWidget);
     expect(find.text('하루 전 알림 시각'), findsOneWidget);
     expect(find.text('당일 알림'), findsOneWidget);
+    expect(find.text('글자 크기'), findsOneWidget);
+    expect(find.text('보통'), findsOneWidget);
+    expect(find.text('크게'), findsOneWidget);
+    expect(find.text('더 크게'), findsOneWidget);
+
+    await tester.tap(find.text('더 크게'));
+    await tester.pumpAndSettle();
+    final preview = tester.element(find.text('가나다 미리보기 · 제사 · 생일'));
+    expect(MediaQuery.textScalerOf(preview).scale(10), 15);
   });
 }
