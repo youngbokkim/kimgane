@@ -257,6 +257,9 @@ void main() {
     await tester.tap(find.text('광산김씨').first);
     await tester.pumpAndSettle();
     expect(find.text('직계선조 묘비'), findsOneWidget);
+    expect(find.text('선산 위치'), findsOneWidget);
+    expect(find.textContaining('양서리 산 36'), findsWidgets);
+    expect(find.text('카카오맵'), findsOneWidget);
     expect(find.textContaining('가선대부'), findsWidgets);
     expect(find.text('제사 축문'), findsNothing);
   });

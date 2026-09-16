@@ -1,3 +1,5 @@
+import 'package:kimgane/core/constants/clan.dart';
+
 class HanjaLine {
   const HanjaLine({
     required this.hanja,
@@ -33,8 +35,27 @@ class ClanPhotoSection {
 class ClanIntroContent {
   static const intro =
       '광산김씨(光山金氏) 김가네 직계는 경상북도 의성 선영을 모십니다. '
-      '아래 사진은 현재 가족묘의 비석입니다. '
+      '선산 위치와 가족묘 비석을 아래에 모아 두었습니다. '
       '한문은 오른쪽에서 왼쪽으로 세로로 읽습니다. 판독이 족보와 다르면 족보를 따릅니다.';
+
+  static const seonsanPhoto = ClanPhotoSection(
+    id: 'seonsan',
+    title: '선산 위치',
+    subtitle: ClanCatalog.seonsanAddress,
+    assetPath: ClanCatalog.seonsanAsset,
+    summary:
+        '의성 선산 필지입니다. 주소는 ${ClanCatalog.seonsanAddress}이고, '
+        '면적은 ${ClanCatalog.seonsanArea}입니다.',
+    lines: [],
+  );
+
+  static ClanPhotoSection? photoById(String id) {
+    if (id == seonsanPhoto.id) return seonsanPhoto;
+    for (final section in sections) {
+      if (section.id == id) return section;
+    }
+    return null;
+  }
 
   static const sections = <ClanPhotoSection>[
     ClanPhotoSection(

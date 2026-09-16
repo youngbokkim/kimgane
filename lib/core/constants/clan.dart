@@ -3,6 +3,25 @@ class ClanCatalog {
   static const clanName = '광산김씨';
   static const clanHanja = '光山金氏';
 
+  static const seonsanName = '의성 선산';
+  static const seonsanAddress = '경상북도 의성군 다인면 양서리 산 36';
+  static const seonsanArea = '2,777㎡';
+  static const seonsanAsset = 'assets/images/선산위치.png';
+
+  static Uri get seonsanKakaoMap => Uri.parse(
+    'https://map.kakao.com/link/search/${Uri.encodeComponent(seonsanAddress)}',
+  );
+
+  static Uri get seonsanNaverMap => Uri.parse(
+    'https://map.naver.com/p/search/${Uri.encodeComponent(seonsanAddress)}',
+  );
+
+  static Uri get seonsanGoogleMap => Uri.https(
+    'www.google.com',
+    '/maps/search/',
+    {'api': '1', 'query': seonsanAddress},
+  );
+
   static const bonGwanHanja = <String, String>{
     '광산': '光山',
     '김해': '金海',

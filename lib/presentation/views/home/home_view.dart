@@ -126,10 +126,10 @@ class HomeView extends ConsumerWidget {
           const SizedBox(height: 20),
           SectionCard(
             title: '광산김씨',
-            subtitle: '의성 가족묘 · 선조 벼슬',
+            subtitle: '의성 선산 · 가족묘 비석',
             onTap: () => context.push('/clan'),
             trailing: const Icon(Icons.chevron_right),
-            child: const Text('직계선조 묘비와 36대·37대 비석을 한글로 풀어 두었습니다.'),
+            child: const Text('의성 선산 위치와 직계선조 묘비, 36대·37대 비석을 한글로 풀어 두었습니다.'),
           ),
           const SizedBox(height: 12),
           SectionCard(

@@ -26,11 +26,11 @@ class RiteHubView extends StatelessWidget {
           const SizedBox(height: 16),
           SectionCard(
             title: '광산김씨 소개',
-            subtitle: '의성 가족묘 비석 · 벼슬',
+            subtitle: '의성 선산 · 가족묘 비석 · 벼슬',
             onTap: () => context.push('/clan'),
             trailing: const Icon(Icons.chevron_right),
             child: const Text(
-              '직계선조 묘비의 벼슬과 36·37대 가족묘 비석을 '
+              '선산 위치와 직계선조 묘비의 벼슬, 36·37대 가족묘 비석을 '
               '사진과 한글 풀이로 봅니다.',
             ),
           ),

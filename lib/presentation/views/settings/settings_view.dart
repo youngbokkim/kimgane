@@ -128,7 +128,7 @@ class SettingsView extends ConsumerWidget {
           ListTile(
             contentPadding: EdgeInsets.zero,
             title: const Text('광산김씨 소개'),
-            subtitle: const Text('가족묘 비석 · 벼슬 한글 풀이'),
+            subtitle: const Text('선산 위치 · 가족묘 비석 · 벼슬 한글 풀이'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/clan'),
           ),
