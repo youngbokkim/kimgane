@@ -146,7 +146,7 @@ class SeedData {
         name: '함영희',
         gender: Gender.female,
         kinship: Kinship.paternalAuntYounger,
-        bonGwan: '함양',
+        bonGwan: '강릉',
         surname: '함',
         birthCalendar: CalendarKind.lunar,
         birthMonth: 2,
